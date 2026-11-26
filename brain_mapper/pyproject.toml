@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "brain-mapper"
+version = "0.1.0"
+description = "Local demo web app for the open-cognionics EEG library"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=2.2.6",
+    "open-cognionics",
+    "starlette>=1.7.0",
+    "uvicorn>=0.54.0",
+    "websockets>=16.1.1",
+]
+
+[project.scripts]
+brain-mapper = "brain_mapper.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/brain_mapper"]
+
+[tool.uv.sources]
+open-cognionics = { workspace = true }

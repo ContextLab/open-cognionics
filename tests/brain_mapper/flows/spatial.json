@@ -1,0 +1,13 @@
+[
+  {"id": "participant", "kind": "setup", "title": "Participant", "blocks": []},
+  {
+    "id": "spatial",
+    "kind": "task",
+    "title": "Spatial memory",
+    "blocks": [
+      {"id": "block1", "seconds": 60, "points": 100},
+      {"id": "block2", "seconds": 60, "points": 100}
+    ]
+  },
+  {"id": "summary", "kind": "summary", "title": "Summary", "blocks": []}
+]

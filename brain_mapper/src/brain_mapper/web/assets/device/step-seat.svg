@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160" width="240" height="160" fill="none" stroke="#121826" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="A head seen from the side with the headset band, forehead pads and an ear clip">
+  <!-- the head from the side, facing right -->
+  <path d="M84 152 L88 124 C62 112 50 90 54 66 C60 34 90 16 122 18 C154 20 174 42 174 66 L180 84 L192 98 L178 102 L176 112 L172 122 C170 130 160 134 150 134 L142 152"/>
+  <path d="M96 78 C92 78 90 86 91 94 C92 102 99 104 102 98" stroke-width="2.5"/>
+  <!-- the band over the crown with the box on it, and the pads on the forehead -->
+  <path d="M170 56 C160 18 90 10 62 72" stroke="#2447c8" stroke-width="5"/>
+  <rect x="104" y="4" width="32" height="14" rx="6"/>
+  <circle cx="171" cy="50" r="4.5" fill="#2447c8" stroke="none"/>
+  <circle cx="166" cy="38" r="4.5" fill="#2447c8" stroke="none"/>
+  <!-- the ear clip hanging from the lobe, with its lead from the band -->
+  <path d="M64 78 C62 104 84 112 97 108" stroke="#2447c8" stroke-width="2"/>
+  <rect x="96" y="104" width="9" height="15" rx="3" stroke="#2447c8"/>
+</svg>

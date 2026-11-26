@@ -1,0 +1,5 @@
+three.js r128 (MIT licence, text in LICENSE)
+Source: the r128 tag of the official three.js repository (github.com/mrdoob/three.js), downloaded 2026-11-25, unmodified.
+af527c374b56b8688737a42d7fcea7cb8aaeb57a4e3c6da98b4dffd55bcc3514  build/three.module.js
+69ab5639202b919c9f92013222efdd6abe3c5bcc25fc3c8d68ae6133fafcbcdf  examples/jsm/controls/OrbitControls.js
+7dddf7c5b8fd10ee654db8857d75d104b5557889aa5a91fc4ca545ea7c07062f  LICENSE

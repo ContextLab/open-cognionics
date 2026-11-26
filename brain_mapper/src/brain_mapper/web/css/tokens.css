@@ -1,0 +1,84 @@
+/* Design tokens of the participant page (spec 6.6): off-white and deep navy
+   grounds, cobalt for actions, amber only for points. Fonts are served from
+   this package (SIL OFL, license texts in ../fonts/). */
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/static/fonts/inter-latin-wght-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Bricolage Grotesque";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("/static/fonts/bricolage-grotesque-latin-wght-normal.woff2") format("woff2");
+}
+
+:root {
+  --paper: #f3f5f9;
+  --white: #ffffff;
+  --navy: #121826;
+  --navy-2: #1d2740;
+  --navy-3: #2f3b5c;
+  --ink: #121826;
+  --ink-2: #46506a;
+  --ink-3: #5b6580;
+  --on-navy-2: #a9b4d0;
+  --on-navy-1: #d5dbea;
+  --cobalt: #2447c8;
+  --cobalt-dark: #16308f;
+  --cobalt-light: #a9c0ff;
+  --amber: #f2b33d;
+
+  /* Task stimuli are drawn straight on the dark task screen (no panel of their own): white
+     words, letters, crosses, arrows, outlines and feedback on the navy ground. --stim-ground is
+     that ground, used where a stimulus has to cover what is under it without showing a box.
+     --stim-soft is for secondary text and resting outlines (at least 7:1 on --stim-ground). */
+  --stim: var(--white);
+  --stim-soft: var(--on-navy-1);
+  --stim-ground: var(--navy);
+  --stim-glow: rgba(255, 255, 255, 0.75);
+
+  --display: "Bricolage Grotesque", "Inter", system-ui, sans-serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --gutter: clamp(20px, 4vw, 56px);
+}
+
+/* The three grounds. Each sets the roles the screens draw with. */
+body[data-ground="light"] {
+  --bg: var(--paper);
+  --fg: var(--ink);
+  --fg-2: var(--ink-2);
+  --fg-3: var(--ink-3);
+  --track: #d3d9e6;
+  --fill: var(--navy);
+  --points-fg: var(--navy);
+  --points-bg: var(--amber);
+}
+
+body[data-ground="dark"] {
+  --bg: var(--navy);
+  --fg: var(--white);
+  --fg-2: var(--on-navy-1);
+  --fg-3: var(--on-navy-2);
+  --track: var(--navy-3);
+  --fill: var(--white);
+  --points-fg: var(--amber);
+  --points-bg: transparent;
+}
+
+body[data-ground="amber"] {
+  --bg: var(--amber);
+  --fg: var(--navy);
+  --fg-2: var(--navy);
+  --fg-3: #3b3313;
+  --track: rgba(18, 24, 38, 0.2);
+  --fill: var(--navy);
+  --points-fg: var(--navy);
+  --points-bg: transparent;
+}

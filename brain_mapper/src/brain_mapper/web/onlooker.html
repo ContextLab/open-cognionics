@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>brain-mapper onlooker</title>
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/scene.css">
+<link rel="stylesheet" href="/static/css/onlooker.css">
+<script type="module" src="/static/js/onlooker.js"></script>
+</head>
+<body data-ground="dark">
+<div id="ol-root" data-conn="connecting" data-step="" data-phase="" data-kind="" data-ended="">
+  <header class="ol-head">
+    <h1>Live view</h1>
+    <div id="ol-link" class="ol-link" data-state="connecting" role="status">
+      <span class="ol-dot" aria-hidden="true"></span><span id="ol-link-text">Connecting</span>
+    </div>
+  </header>
+  <div id="ol-lost" role="alert" hidden>Lost the connection to brain-mapper. Trying again.</div>
+  <main class="ol-main">
+    <section class="ol-left">
+      <div class="ol-network-wrap">
+        <div id="ol-network" class="ol-stage" aria-label="Network view, sample data"></div>
+      </div>
+      <p id="ol-network-note" class="ol-note">Sample data: the groups and links drawn here are a made-up example, not measured from this recording.</p>
+      <div class="ol-traces-wrap">
+        <canvas id="ol-traces" aria-label="Live traces of the EEG channels, one row for each"></canvas>
+        <p id="ol-traces-note" class="ol-note">Live traces, the last 8 seconds, one row for each channel.</p>
+      </div>
+    </section>
+    <aside class="ol-right">
+      <section class="ol-card" aria-labelledby="ol-score-title">
+        <h2 id="ol-score-title">Network score</h2>
+        <p id="ol-score" class="ol-score">Score: not measured yet</p>
+      </section>
+      <section class="ol-card ol-headset" aria-labelledby="ol-headset-title">
+        <h2 id="ol-headset-title">Headset contacts</h2>
+        <div id="ol-fit" class="ol-stage ol-fit" aria-label="Headset view"></div>
+        <p id="ol-contact" class="ol-contact">Contact check not done yet</p>
+      </section>
+      <section class="ol-card" aria-labelledby="ol-session-title">
+        <h2 id="ol-session-title">Participant is on</h2>
+        <p id="ol-step" class="ol-step"></p>
+        <p class="ol-where"><span id="ol-block"></span> <span id="ol-phase"></span> <span id="ol-time"></span></p>
+        <p id="ol-ended" class="ol-ended" role="status" hidden></p>
+        <div class="ol-pointsrow">
+          <span id="ol-points" class="ol-points">—</span><span class="ol-caption">points earned of possible, updated after each block</span>
+        </div>
+        <div id="ol-progress" role="progressbar" aria-label="Progress through the session" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+        <p id="ol-progress-text" class="ol-caption"></p>
+      </section>
+    </aside>
+  </main>
+</div>
+</body>
+</html>

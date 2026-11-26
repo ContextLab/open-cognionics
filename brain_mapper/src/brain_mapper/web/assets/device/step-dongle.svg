@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160" width="240" height="160" fill="none" stroke="#121826" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="A USB dongle being pushed into a computer">
+  <!-- the edge of a computer with a USB port -->
+  <rect x="14" y="30" width="84" height="104" rx="12"/>
+  <rect x="86" y="68" width="14" height="26" rx="3"/>
+  <path d="M30 46 H62"/>
+  <path d="M30 60 H50"/>
+  <!-- the dongle: its plug, with two contacts, and its body -->
+  <rect x="128" y="74" width="30" height="20" rx="3"/>
+  <circle cx="137" cy="84" r="2" fill="#121826" stroke="none"/>
+  <circle cx="149" cy="84" r="2" fill="#121826" stroke="none"/>
+  <rect x="158" y="68" width="68" height="32" rx="10"/>
+  <path d="M176 84 H208" stroke-width="2"/>
+  <!-- pushed in -->
+  <path d="M150 48 H112" stroke="#2447c8"/>
+  <path d="M120 40 L110 48 L120 56" stroke="#2447c8"/>
+</svg>

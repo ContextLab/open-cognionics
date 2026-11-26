@@ -1,0 +1,1250 @@
+/* Layout and screens of the participant page. Colors come from tokens.css. */
+
+[hidden] { display: none !important; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, p { margin: 0; }
+
+h1, h2 {
+  font-family: var(--display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+
+:focus-visible {
+  outline: 3px solid var(--cobalt-light);
+  outline-offset: 3px;
+}
+
+body[data-ground="light"] :focus-visible { outline-color: var(--cobalt); }
+
+#app {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+#screen {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.brand {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+/* Buttons ---------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 32px;
+  border: 0;
+  border-radius: 28px;
+  background: var(--cobalt);
+  color: var(--white);
+  font: 600 18px/1 var(--sans);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.btn:hover { background: var(--cobalt-dark); }
+.btn:active { transform: translateY(1px); }
+.btn[disabled] { opacity: 0.55; cursor: default; }
+
+.btn--light { background: var(--white); color: var(--navy); }
+.btn--light:hover { background: var(--on-navy-1); }
+
+.btn--quiet {
+  background: transparent;
+  color: var(--cobalt);
+  box-shadow: inset 0 0 0 2px var(--cobalt);
+  min-height: 48px;
+  font-size: 16px;
+}
+.btn--quiet:hover { background: rgba(36, 71, 200, 0.08); }
+
+/* HUD: round, progress bar, points ---------------------------------------- */
+
+#hud {
+  display: grid;
+  /* The sides take at least their text on one line (the round label can be "Round 9 of 9 ·
+     Delayed free recall, block 1 of 1 done"); the progress bar gives way, down to 120 px. */
+  grid-template-columns: minmax(max-content, 1fr) minmax(120px, 360px) minmax(max-content, 1fr);
+  align-items: center;
+  gap: 24px;
+  padding: 28px var(--gutter) 8px;
+}
+
+#hud-label { font-size: 15px; font-weight: 600; color: var(--fg-3); white-space: nowrap; }
+
+.hud-mid { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+#hud-progress {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+#hud-progress > span {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 4px;
+  background: var(--fill);
+  transition: width 0.5s ease;
+}
+
+#hud-progress-text { font-size: 13px; color: var(--fg-3); }
+
+.hud-right { justify-self: end; text-align: right; }
+
+#hud-points {
+  display: inline-block;
+  min-width: 2ch;
+  padding: 0 10px;
+  border-radius: 10px;
+  background: var(--points-bg);
+  color: var(--points-fg);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-caption { font-size: 12px; color: var(--fg-3); margin-top: 2px; }
+
+@media (max-width: 760px) {
+  #hud { grid-template-columns: 1fr auto; row-gap: 12px; padding-top: 20px; }
+  .hud-mid { grid-column: 1 / -1; grid-row: 2; align-items: stretch; }
+  #hud-label { white-space: normal; }
+}
+
+/* Start ---------------------------------------------------------------- */
+
+.start {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.start-main {
+  padding: clamp(32px, 6vw, 72px) var(--gutter);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.start h1 {
+  margin-top: clamp(8px, 3vw, 40px);
+  font-size: clamp(40px, 5.2vw, 64px);
+  max-width: 11em;
+}
+
+.lede { font-size: 18px; line-height: 1.5; color: var(--fg-2); max-width: 26em; }
+
+.start-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding-top: 16px;
+}
+
+.start-actions .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.hint { font-size: 14px; color: var(--fg-3); max-width: 34em; }
+.credit { font-size: 12px; color: var(--fg-3); max-width: 40em; }
+.problem { font-size: 14px; font-weight: 600; color: #b3261e; }
+
+.route {
+  background: var(--navy);
+  color: var(--white);
+  padding: clamp(32px, 6vw, 72px) clamp(24px, 4.5vw, 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.route h2 { font-family: var(--sans); font-size: 15px; font-weight: 600; letter-spacing: 0; color: var(--on-navy-2); line-height: 1.4; }
+
+.route ol {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.route li {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  background: var(--navy-2);
+}
+
+.route .num {
+  width: 36px;
+  height: 36px;
+  border-radius: 18px;
+  background: var(--navy-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.route .what { font-size: 17px; font-weight: 600; }
+.route .len { font-size: 14px; color: var(--on-navy-2); font-variant-numeric: tabular-nums; }
+.route .note { margin-top: auto; padding-top: 8px; font-size: 15px; color: var(--on-navy-2); }
+
+@media (min-width: 760px) {
+  .start { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  #screen[data-screen="start"] { min-height: 100vh; min-height: 100dvh; }
+  .start-main { padding-top: 40px; padding-bottom: 32px; gap: 18px; }
+  .start h1 { margin-top: 0; font-size: clamp(34px, 4.6vw, 56px); }
+  .start-actions { gap: 10px; padding-top: 8px; }
+  .hint { font-size: 13px; line-height: 1.4; }
+  .route { padding: 40px clamp(20px, 3vw, 40px) 32px; gap: 10px; }
+  .route li { grid-template-columns: 32px 1fr auto; gap: 12px; padding: 7px 12px; }
+  .route .num { width: 32px; height: 32px; }
+  .route .what { font-size: 16px; }
+  .route .len { font-size: 13px; }
+}
+
+@media (min-width: 1000px) {
+  .start { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); }
+  .start-main { padding-top: clamp(40px, 6vw, 72px); gap: 24px; }
+  .start h1 { margin-top: clamp(8px, 3vw, 40px); font-size: clamp(40px, 5.2vw, 64px); }
+  .start-actions { gap: 14px; padding-top: 16px; }
+  .hint { font-size: 14px; line-height: 1.5; }
+  .route { padding: clamp(32px, 6vw, 72px) clamp(24px, 4.5vw, 64px); gap: 14px; }
+  .route li { grid-template-columns: 36px 1fr auto; gap: 14px; padding: 10px 16px; }
+  .route .num { width: 36px; height: 36px; }
+  .route .what { font-size: 17px; }
+  .route .len { font-size: 14px; }
+}
+
+@media (min-width: 1000px) and (max-height: 820px) {
+  .start-main { padding-top: 40px; padding-bottom: 32px; gap: 18px; }
+  .start h1 { margin-top: 0; font-size: clamp(40px, 4.6vw, 56px); }
+  .start-actions { gap: 10px; padding-top: 8px; }
+  .hint { font-size: 13px; line-height: 1.4; }
+  .route { padding-top: 40px; padding-bottom: 32px; gap: 10px; }
+  .route li { padding: 7px 14px; }
+}
+
+/* The line on choosing rounds and the Choose several toggle take room above the list: on a
+   window up to 940 px high the list is drawn more tightly so that it still fits. */
+@media (min-width: 1000px) and (max-height: 940px) {
+  .route { padding-top: 40px; padding-bottom: 32px; gap: 10px; }
+  .route li { padding: 5px 14px; }
+  .route .num { width: 32px; height: 32px; }
+}
+
+/* Setup and summary ---------------------------------------------------------- */
+
+.plain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  width: min(100%, 640px);
+  padding: 32px var(--gutter) 64px;
+  margin: 0 auto;
+}
+
+.plain h1 { font-size: clamp(40px, 6vw, 72px); }
+.plain p { font-size: 18px; color: var(--fg-2); max-width: 30em; }
+.plain .btn { align-self: flex-start; margin-top: 8px; }
+
+/* Participant ---------------------------------------------------------------- */
+
+.participant-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  width: min(100%, 640px);
+  padding: 24px var(--gutter) 48px;
+  margin: 0 auto;
+}
+
+.participant-main h1 { font-size: clamp(34px, 5vw, 56px); }
+.participant-main .lede { max-width: 30em; }
+
+.kicker { font-size: 15px; font-weight: 600; color: var(--fg-3); }
+
+.participant-form { display: flex; flex-direction: column; gap: 10px; }
+.field-label { font-size: 15px; font-weight: 600; color: var(--fg-2); }
+
+#participant-label {
+  width: 100%;
+  min-height: 56px;
+  padding: 0 20px;
+  border: 2px solid var(--track);
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--ink);
+  font: 500 20px/1 var(--sans);
+}
+
+#participant-label:focus { border-color: var(--cobalt); outline: 0; box-shadow: 0 0 0 4px rgba(36, 71, 200, 0.18); }
+#participant-label[aria-invalid="true"] { border-color: #b3261e; }
+
+.participant-form .problem { font-size: 15px; line-height: 1.4; }
+/* The words that are announced stay in the page when empty; an empty one takes no room. */
+.participant-form p:empty { margin: -5px 0; }
+.participant-form .btn { align-self: flex-start; margin-top: 6px; }
+
+.remembered { display: flex; flex-direction: column; gap: 10px; }
+.remembered h2 { font-family: var(--sans); font-size: 15px; font-weight: 600; letter-spacing: 0; line-height: 1.4; color: var(--fg-2); }
+.remembered-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
+.remembered-buttons .btn { min-height: 44px; padding: 0 20px; font-variant-numeric: tabular-nums; }
+
+.participant-main .note { font-size: 14px; color: var(--fg-3); max-width: 34em; }
+
+/* Placeholder round ---------------------------------------------------------- */
+
+.round {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px var(--gutter) 64px;
+  text-align: center;
+}
+
+.round h1 { font-size: clamp(48px, 9vw, 112px); }
+.round .sub { font-size: 20px; color: var(--fg-2); }
+.round .where { font-size: 16px; font-weight: 600; color: var(--fg-3); }
+
+#time-left {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(56px, 10vw, 120px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin-top: 12px;
+}
+
+.round .time-caption { font-size: 14px; color: var(--fg-3); margin-top: -8px; }
+.round .btn { margin-top: 16px; }
+
+/* Task screens (web/js/tasks/) ------------------------------------------------------ */
+
+.task {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 24px var(--gutter) 64px;
+  text-align: center;
+  outline: none;
+}
+
+/* The instruction screen, the same order in every task: the name, the rule and its example, the
+   keys, then how to start. Type grows on tall windows (about 40 px at 3840 x 1600, 22 px from
+   1080 px high down), as on the setup screens (css/layout.css); the stimuli are not affected. */
+.task-intro { display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2vmin - 8px, 28px); }
+.task-intro h1 { font-size: clamp(32px, max(4.5vw, 8vmin - 56px), 76px); }
+.task-intro .where, .task-cue-where { font-size: clamp(16px, max(16px, 2.8vmin - 15px), 32px); font-weight: 600; color: var(--fg-2); }
+/* Line breaks in the instructions are kept: a rule in short lines. */
+.task-instructions { font-size: clamp(22px, max(22px, 4.4vmin - 30px), 44px); line-height: 1.45; max-width: 34em; white-space: pre-wrap; }
+/* How a task that starts with Start begins (Words: "Press Enter to start."), just above Start. */
+.task-enter-line { font-size: clamp(22px, max(22px, 4.4vmin - 30px), 44px); font-weight: 700; color: var(--stim); }
+.task-enter-line[hidden] { display: none; }
+/* Skip and Stop stay on the task screens, plain and without the rule above them. */
+.task .leave { border-top: 0; }
+.task .btn { font-size: clamp(18px, max(18px, 3.4vmin - 20px), 40px); min-height: clamp(48px, max(48px, 5vmin - 4px), 80px); padding: 0 1.2em; }
+.task .leave-btn { font-size: clamp(14px, max(14px, 2vmin - 8px), 24px); }
+.task .sub { font-size: 18px; color: var(--fg-2); }
+.task-actions { display: flex; gap: 12px; margin-top: 8px; }
+
+/* A task screen is exactly as tall as the window: the stage takes the height that the text,
+   the key legend and the leave controls leave over, and the stimulus area in it is sized from that. */
+#app:has(.task-stage) {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+}
+
+.task-stage {
+  flex: 1 1 0;
+  min-height: 0;
+  container-type: size;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  isolation: isolate; /* the background layer stays behind what is drawn in the stage */
+}
+
+/* The background layer of io.background(): fills the stimulus area, behind the stimuli. */
+.task-background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.task-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 24px;
+  font-size: 16px;
+  color: var(--stim);
+}
+.task-legend li { display: flex; align-items: center; gap: 8px; }
+.task-legend kbd {
+  font-family: var(--sans, inherit);
+  font-weight: 600;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  padding: 2px 10px;
+}
+
+/* The shared stimulus area: a centered square on the dark task screen with no ground, border or
+   shadow of its own (the stimuli are drawn straight on the page's navy ground, in --stim white),
+   sized from the viewport and from the height the stage has, so that it, the key legend and the
+   leave controls below it fit from 1024x768 up without scrolling (the area shrinks, the text does
+   not). Draw in it in units of --panel (e.g. font-size: calc(var(--panel) * 0.12)). */
+.task-panel {
+  --panel: min(60vh, 70vw, 760px, 100cqh, 100cqw);
+  width: var(--panel);
+  height: var(--panel);
+  flex: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: transparent;
+  color: var(--stim);
+  font-family: var(--display);
+  font-size: calc(var(--panel) * 0.12);
+  line-height: 1.1;
+  isolation: isolate;
+}
+
+/* Practice feedback, the same in every task (`feedbackNode` in tasks/runner.js): white text
+   centered in the stimulus area. Its ground is the page's own navy, so it covers any outline
+   drawn under it without showing a box. One color for every answer: nothing reads as a score. */
+.task-feedback {
+  /* Centered by layout, not by a transform, so its edges fall on whole pixels and never show
+     as a faint line over the perception canvas. */
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: fit-content;
+  height: fit-content;
+  padding: 0.3em 0.8em;
+  background: var(--stim-ground);
+  color: var(--stim);
+  font-family: var(--sans);
+  font-size: calc(var(--panel) * 0.06);
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.task-feedback[hidden] { display: none; }
+
+/* A task that starts on Enter (`enter: true` in tasks/runner.js) and has key labels (`sides`): the
+   stage holds a row of the left key label, the stimulus area and the right key label. The area is
+   a centered square of about 0.7 of the window's height, never wider than the room the labels
+   leave inside the middle 60% of the window's width, so the labels sit just outside it, near
+   enough to the center to be read without looking away from it, never at the screen's edges. */
+.task-row {
+  --side: clamp(96px, 7vw, 240px);
+  --side-gap: clamp(16px, 2vw, 64px);
+  --panel: min(70vh, 100cqh, 100cqw - 2 * (var(--side) + var(--side-gap)), 60vw - 2 * (var(--side) + var(--side-gap)));
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--side-gap);
+}
+.task-row .task-panel { --panel: inherit; }
+/* On tall windows the instruction screen (the Enter prompt, `data-ready` "practice" or "block")
+   gives the stimulus area the size it has during trials, not the room left under the
+   instructions, so the key labels and the prompt (sized from it) are as large as while the block
+   runs. The area is empty there but for the prompt at its middle; the stage clips the rest of it,
+   so it neither scrolls the page nor covers the instructions or the leave controls. */
+@media (min-height: 1100px) {
+  .task[data-ready="practice"] .task-stage,
+  .task[data-ready="block"] .task-stage { overflow: clip; }
+  .task[data-ready="practice"] .task-row,
+  .task[data-ready="block"] .task-row {
+    --panel: min(70vh, 100cqw - 2 * (var(--side) + var(--side-gap)), 60vw - 2 * (var(--side) + var(--side-gap)));
+  }
+}
+
+/* A key label: the key letter large (0.08 of the stimulus area's side), what it means under it.
+   A press in a response window lights it for 150 ms (`is-pressed`), the same for either key. */
+.task-side {
+  flex: none;
+  width: var(--side);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4em;
+  color: var(--stim);
+  font-family: var(--sans);
+  font-size: clamp(15px, calc(var(--panel) * 0.03), 32px);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+.task-side kbd {
+  font-family: var(--sans);
+  font-size: max(28px, calc(var(--panel) * 0.08));
+  font-weight: 700;
+  line-height: 1;
+  min-width: 1.5em;
+  padding: 0.18em 0.25em;
+  border: max(2px, calc(var(--panel) * 0.004)) solid var(--stim);
+  border-radius: 0.18em;
+}
+.task-side.is-pressed kbd { background: var(--stim); color: var(--stim-ground); }
+
+/* The prompt before practice and before every block, with the block line ("Practice: 10 trials")
+   under it, over the middle of the stimulus area. */
+.task-cue {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: var(--panel);
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8em;
+  pointer-events: none;
+}
+/* The block line hangs under the prompt, so the prompt keeps its place in the middle of the area. */
+.task-cue .task-cue-where { position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.6em; text-align: center; }
+.task-cue-where[hidden] { display: none; }
+.task-prompt {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  color: var(--stim);
+  font-family: var(--sans);
+  font-size: clamp(16px, calc(var(--panel) * 0.055), 52px);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  pointer-events: none;
+}
+.task-prompt[hidden] { display: none; }
+
+/* The fixation cross of the lead-in after Enter: two white bars in the middle of the area. */
+.task-leadin {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: calc(var(--panel) * 0.08);
+  height: calc(var(--panel) * 0.08);
+  background:
+    linear-gradient(var(--stim), var(--stim)) center / 100% max(3px, calc(var(--panel) * 0.012)) no-repeat,
+    linear-gradient(var(--stim), var(--stim)) center / max(3px, calc(var(--panel) * 0.012)) 100% no-repeat;
+  pointer-events: none;
+}
+
+/* A worked example under the instructions: a row of items, each with a line under it. */
+.task-example {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 18px;
+  color: var(--stim);
+}
+.task-example[hidden] { display: none; }
+.task-example li { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 4.5em; }
+.task-example-top { font-family: var(--display); font-size: clamp(34px, max(34px, 5vmin - 10px), 72px); font-weight: 700; line-height: 1; }
+.task-example-bottom { font-size: clamp(16px, max(16px, 2.6vmin - 12px), 30px); color: var(--fg-2); }
+/* Low windows (1024 x 768): the instructions and the example are set tighter, so that the stimulus
+   area under them keeps room for the Enter prompt (2-back's long instructions left it 79 px wide,
+   and the prompt ran up over the example). */
+@media (max-height: 820px) {
+  .task-intro { gap: 8px; }
+  .task-intro h1 { font-size: clamp(32px, 4.5vw, 44px); }
+  .task-instructions { font-size: 19px; line-height: 1.35; max-width: 42em; }
+  .task-example-top { font-size: 28px; }
+}
+
+.example-square { width: calc(var(--panel, 400px) * 0.3); height: calc(var(--panel, 400px) * 0.3); background: var(--stim); }
+.example-cross { font-size: calc(var(--panel, 400px) * 0.5); font-weight: 300; line-height: 1; color: var(--stim); }
+
+/* Between blocks: full amber -------------------------------------------------- */
+
+.between {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  align-items: center;
+  padding: 8px var(--gutter) 48px;
+}
+
+.between .gain { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.between .gain .lead { font-size: 20px; font-weight: 600; }
+
+#between-gained {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: clamp(56px, 10vw, 140px);
+  line-height: 0.95;
+  white-space: nowrap;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.between .gain p { font-size: 20px; line-height: 1.45; max-width: 24em; }
+.between #between-total { font-variant-numeric: tabular-nums; }
+
+.next-card {
+  background: var(--navy);
+  color: var(--white);
+  border-radius: 24px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.next-card .label { font-size: 14px; color: var(--on-navy-2); }
+.next-card h2 { font-size: 34px; line-height: 1.1; letter-spacing: -0.02em; }
+.next-card .detail { font-size: 16px; color: var(--on-navy-1); }
+.next-card .btn { margin-top: 8px; }
+.next-card .aside { font-size: 13px; color: var(--on-navy-2); text-align: center; }
+
+@media (min-width: 1000px) {
+  .between { grid-template-columns: minmax(0, 1fr) 420px; gap: 56px; }
+}
+
+/* Rest ------------------------------------------------------------------------ */
+
+.rest {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 32px var(--gutter);
+  text-align: center;
+}
+
+.rest .instruction { font-size: clamp(24px, 3.4vw, 36px); line-height: 1.35; color: var(--fg-2); max-width: 22em; }
+.rest svg { width: min(48vmin, 320px); height: auto; display: block; }
+.rest .btn { margin-top: 8px; }
+.rest-body { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.rest .rest-title { font-size: clamp(32px, 4.4vw, 56px); color: var(--fg); }
+.rest .rest-length { font-size: clamp(16px, 1.6vw, 20px); color: var(--fg-3); }
+
+/* Ended and refused ------------------------------------------------------------- */
+
+.ended {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 32px var(--gutter) 64px;
+}
+
+.ended h1 { font-size: clamp(40px, 6vw, 72px); }
+.ended p { font-size: 18px; color: var(--fg-2); max-width: 32em; }
+
+#ended-reason {
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: var(--navy-2);
+  color: var(--white);
+  font-size: 17px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ended a { color: var(--cobalt-light); font-weight: 600; }
+
+/* Overlays ------------------------------------------------------------------------ */
+
+#fs-lost {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(18, 24, 38, 0.96);
+  color: var(--white);
+}
+
+#fs-lost .card {
+  width: min(100%, clamp(560px, 30vw, 860px));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 36px;
+  border-radius: 24px;
+  background: var(--navy-2);
+}
+
+#fs-lost h2 { font-size: clamp(32px, 2.6vw, 64px); }
+#fs-lost p { font-size: clamp(18px, 1vw, 26px); color: var(--on-navy-1); }
+#fs-lost .left { font-size: clamp(15px, 0.85vw, 22px); color: var(--on-navy-2); }
+#fs-lost .fs-actions .btn { font-size: clamp(18px, 0.9vw, 22px); }
+#fs-lost .btn { align-self: flex-start; margin-top: 8px; background: var(--white); color: var(--navy); }
+#fs-lost .btn:hover { background: var(--on-navy-1); }
+#fs-lost .btn[disabled]:hover { background: var(--white); }
+#fs-lost .fs-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+#fs-lost .fs-actions .btn { margin-top: 0; }
+#fs-lost .btn--ghost { background: transparent; color: var(--white); box-shadow: inset 0 0 0 2px var(--on-navy-2); }
+#fs-lost .btn--ghost:hover { background: rgba(255, 255, 255, 0.08); }
+#fs-lost .btn--ghost[disabled]:hover { background: transparent; }
+/* The headset check of the paused screen: the calibration's contact view on the light ground. */
+#fs-lost .hc {
+  --bg: var(--paper); --fg: var(--ink); --fg-2: var(--ink-2); --fg-3: var(--ink-3); --track: #d3d9e6;
+  width: min(100%, 1200px);
+  max-height: 100%;
+  background: var(--paper);
+  color: var(--ink);
+}
+#fs-lost .hc p { color: var(--ink-2); }
+#fs-lost .hc .calib-view { max-height: min(60vh, 640px); }
+#fs-lost .hc .btn { background: var(--cobalt); color: var(--white); }
+#fs-lost .hc .btn:hover { background: var(--cobalt-dark); }
+#fs-lost .hc-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+#fs-lost .hc-actions .btn { margin-top: 0; }
+#fs-lost .hc .hc-hint { font-size: 15px; color: var(--ink-3); }
+
+#notice, #conn-lost {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  max-width: min(90vw, 640px);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+#notice { bottom: 24px; background: var(--white); color: var(--navy); box-shadow: 0 8px 24px rgba(18, 24, 38, 0.3); }
+#conn-lost { top: 16px; background: #b3261e; color: var(--white); }
+
+/* Reduced motion: no transition, no animation ---------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Choosing rounds on the start screen ---------------------------------------------- */
+
+.route li { position: relative; }
+
+/* A button on the round's name that covers the whole row, so the row can be pressed anywhere. */
+.route-pick {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.route-pick::after { content: ""; position: absolute; inset: 0; border-radius: 14px; }
+.route-pick:hover::after { background: rgba(255, 255, 255, 0.06); }
+.route-pick:focus-visible { outline: 0; }
+.route-pick[aria-pressed="true"]::after { box-shadow: inset 0 0 0 2px var(--cobalt-light); }
+.route-pick[aria-pressed="true"]::after { background: rgba(169, 192, 255, 0.1); }
+/* The round in focus: a ring of its own, outside the row, so it differs from a chosen round. */
+.route-pick:focus-visible::after { outline: 3px solid var(--white); outline-offset: 3px; }
+
+/* The heading of the list, with the "Choose several" toggle on the same line. */
+.route-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.pick-several {
+  min-height: 36px;
+  padding: 0 16px;
+  border-radius: 18px;
+  font-size: 14px;
+}
+.pick-several:focus-visible { outline: 3px solid var(--cobalt-light); outline-offset: 2px; }
+.route .pick-several[aria-pressed="true"],
+.route .pick-several[aria-pressed="true"]:hover { background: var(--cobalt-light); color: var(--navy); box-shadow: none; }
+.pick-several[aria-pressed="true"]::before { content: "\2713"; margin-right: 6px; }
+.route .pick-how { font-size: 13px; line-height: 1.4; color: var(--on-navy-2); }
+
+/* With "Choose several" on, each round is drawn as a checkbox (its state is aria-pressed). */
+.route[data-several="true"] .route-pick::before {
+  content: "";
+  display: inline-block;
+  box-sizing: border-box;
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  vertical-align: -3px;
+  border: 2px solid var(--on-navy-2);
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 14px;
+  text-align: center;
+}
+.route[data-several="true"] .route-pick[aria-pressed="true"]::before {
+  content: "\2713";
+  background: var(--cobalt-light);
+  border-color: var(--cobalt-light);
+  color: var(--navy);
+  font-weight: 700;
+}
+
+/* The rounds chosen and their total, under the lede on the light side. */
+.pick {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--track);
+  background: var(--white);
+  max-width: 30em;
+}
+.pick p { font-size: 15px; line-height: 1.45; color: var(--fg-2); }
+.pick .pick-note { font-size: 13px; color: var(--fg-3); }
+.pick .btn { min-height: 44px; font-size: 16px; padding: 0 24px; }
+.pick .btn:focus-visible { outline: 3px solid var(--cobalt); outline-offset: 2px; }
+
+.btn--ghost {
+  background: transparent;
+  color: var(--on-navy-1);
+  box-shadow: inset 0 0 0 2px var(--navy-3);
+}
+.btn--ghost:hover { background: rgba(255, 255, 255, 0.08); }
+
+/* Skip this round, Stop here -------------------------------------------------------- */
+
+/* Small, plain and set apart from the main button, and each asks once more before it sends. */
+.leave {
+  margin-top: 28px;
+  padding-top: 14px;
+  border-top: 1px solid var(--track);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 30em;
+}
+.leave[hidden] { display: none; }
+/* On a task screen the controls keep their room while hidden (in a running block), so the
+   stimulus area has the same size in practice and in the block. */
+.task .leave[hidden] { display: flex !important; visibility: hidden; }
+.task .leave[hidden] .leave-btn[hidden] { display: inline-block !important; }
+.leave-row { display: flex; flex-wrap: wrap; gap: 4px 24px; }
+.leave-row[hidden], .leave-ask[hidden] { display: none; }
+
+.leave-btn {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 8px 2px;
+  min-height: 40px;
+  font: 500 14px/1.2 var(--sans);
+  color: var(--fg-3);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.leave-btn:hover { color: var(--fg); }
+
+.leave-ask p { font-size: 14px; line-height: 1.45; color: var(--fg-2); }
+.leave-yes {
+  appearance: none;
+  background: transparent;
+  color: var(--fg);
+  border: 2px solid currentColor;
+  border-radius: 22px;
+  min-height: 44px;
+  padding: 0 18px;
+  font: 600 15px/1 var(--sans);
+  cursor: pointer;
+}
+.leave-yes:hover { background: rgba(127, 127, 127, 0.15); }
+
+.round .leave, .rest .leave { align-self: center; align-items: center; text-align: center; }
+.round .leave-row, .rest .leave-row { justify-content: center; }
+.next-card .leave, #fs-lost .leave { border-top-color: rgba(255, 255, 255, 0.16); max-width: none; }
+.next-card .leave-btn, #fs-lost .leave-btn { color: var(--on-navy-2); }
+.next-card .leave-btn:hover, #fs-lost .leave-btn:hover { color: var(--white); }
+.next-card .leave-ask p, #fs-lost .leave-ask p { color: var(--on-navy-1); font-size: 14px; }
+.next-card .leave-yes, #fs-lost .leave-yes { color: var(--white); }
+#fs-lost .leave { margin-top: 12px; }
+
+/* Participant: an earlier session to continue ---------------------------------------- */
+
+.offer {
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--fg-2);
+  max-width: 34em;
+  padding-left: 14px;
+  border-left: 3px solid var(--cobalt);
+}
+.participant-form .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.participant-form .row .btn { align-self: center; }
+
+/* Participant: a saved session file, chosen or dropped ----------------------------------- */
+
+.import-box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 14px 16px;
+  border: 2px dashed var(--track);
+  border-radius: 16px;
+}
+.import-box.dragging { border-color: var(--cobalt); background: rgba(36, 71, 200, 0.06); }
+.import-box .row .btn { margin-top: 0; }
+.import-summary { font-size: 16px; font-weight: 600; line-height: 1.4; color: var(--fg-2); }
+.import-box p:empty { display: none; }
+#participant-label[readonly] { background: transparent; }
+
+/* Summary of a stopped session -------------------------------------------------------- */
+
+.outcomes { list-style: none; margin: 0; padding: 0; display: grid; max-width: 30em; }
+.outcomes li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--track);
+  font-size: 17px;
+}
+.outcomes .what { font-weight: 600; color: var(--fg); }
+.outcomes .how { font-size: 15px; font-weight: 600; color: var(--fg-3); }
+.outcomes li[data-outcome="finished"] .how { color: var(--fg); }
+.plain .note { font-size: 15px; color: var(--fg-3); margin-top: 8px; }
+
+/* The record of a session that is over (summary and ended screens) ----------------------- */
+
+.plain.summary { width: min(100%, 980px); justify-content: flex-start; padding-top: 48px; }
+.ended:has(.record:not([hidden])) { width: min(100%, 980px); justify-content: flex-start; padding-top: 48px; }
+
+.record { display: flex; flex-direction: column; gap: 22px; padding-top: 8px; border-top: 1px solid var(--track); }
+.record h2 { font-size: 22px; letter-spacing: -0.01em; margin-bottom: 8px; }
+.record .who { font-size: 18px; color: var(--fg-2); padding-top: 16px; }
+.record .who strong { color: var(--fg); font-weight: 700; }
+.record .total { font-size: 18px; font-weight: 600; color: var(--fg); font-variant-numeric: tabular-nums; }
+
+.record-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 24px 40px;
+  align-items: start;
+}
+
+/* The points of each task round: title, earned of possible, and why there is a dash. */
+.scores { list-style: none; margin: 8px 0 0; padding: 0; font-size: 15px; color: var(--fg-2); }
+.scores li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 16px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--track);
+  font-variant-numeric: tabular-nums;
+}
+.scores .what { color: var(--fg); font-weight: 600; }
+.scores .how { color: var(--fg); font-weight: 600; text-align: right; }
+.scores .why { grid-column: 1 / -1; color: var(--fg-3); font-size: 14px; }
+
+.timeline { width: 100%; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+.timeline th { text-align: left; font-size: 13px; font-weight: 600; color: var(--fg-3); padding: 0 12px 6px 0; }
+.timeline td { padding: 5px 12px 5px 0; border-top: 1px solid var(--track); color: var(--fg-2); }
+.timeline td:first-child { color: var(--fg); font-weight: 600; }
+
+.record .none { font-size: 15px; color: var(--fg-3); }
+.record .zip { font-size: 16px; color: var(--fg-2); max-width: none; overflow-wrap: anywhere; }
+.record .zip strong { color: var(--fg); }
+.record .zip .path { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 14px; }
+.record .zip[data-state="failed"] {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border-left: 4px solid var(--amber);
+  background: rgba(242, 179, 61, 0.14);
+  color: var(--fg);
+}
+.record-zip { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.record-zip .btn { margin-top: 10px; }
+.ended .record-zip .btn { background: var(--white); color: var(--navy); }
+.ended .record-zip .btn:hover { background: var(--on-navy-1); }
+.record .note { font-size: 15px; color: var(--fg-3); }
+
+@media (max-width: 760px) {
+  .record-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Device setup ------------------------------------------------------------ */
+
+.device {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(100%, 1100px);
+  padding: 8px var(--gutter) 24px;
+  margin: 0 auto;
+}
+.device-head { display: flex; flex-direction: column; gap: 4px; }
+.device h1 { font-size: clamp(28px, 4vw, 40px); }
+
+.device-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.device-steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 14px 14px;
+  background: var(--white);
+  border-radius: 18px;
+}
+.device-steps img { width: 100%; height: auto; max-height: 72px; object-fit: contain; }
+.step-words { display: flex; flex-direction: column; gap: 4px; }
+.step-num {
+  align-self: flex-start;
+  min-width: 26px;
+  padding: 0 8px;
+  border-radius: 13px;
+  background: var(--navy);
+  color: var(--white);
+  font: 700 14px/26px var(--sans);
+  text-align: center;
+}
+.step-words h2 { font-size: 18px; letter-spacing: -0.02em; }
+.step-words p { font-size: 13px; line-height: 1.4; color: var(--fg-2); }
+
+.device-replay {
+  padding: 14px 18px;
+  background: var(--white);
+  border-radius: 14px;
+  font-size: 16px;
+  color: var(--fg-2);
+}
+
+.device-status { display: flex; flex-direction: column; gap: 12px; }
+.device-link { display: flex; align-items: center; gap: 10px; font-size: 16px; }
+.link-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--fg-3); flex: none; }
+.device-link[data-state="live"] .link-dot { background: #1f8a4c; }
+.device-link[data-state="connecting"] .link-dot { background: var(--amber); }
+.device-link[data-state="ended"] .link-dot { background: #b3261e; }
+.link-word { font-weight: 700; }
+.link-note { color: var(--fg-3); }
+
+.device-stats { display: flex; flex-wrap: wrap; gap: 12px 28px; }
+.stat { display: flex; flex-direction: column; min-width: 90px; }
+.stat-value { font: 700 28px/1.1 var(--display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.stat-caption { font-size: 13px; color: var(--fg-3); }
+
+.device-tip {
+  padding: 12px 16px;
+  border-left: 5px solid var(--cobalt);
+  background: var(--white);
+  border-radius: 0 12px 12px 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink);
+  max-width: 52em;
+}
+
+.device-live { display: flex; flex-direction: column; gap: 4px; min-height: 0; }
+.device-traces {
+  --trace-ink: #121826;
+  --trace-grid: #d3d9e6;
+  display: block;
+  width: 100%;
+  height: clamp(150px, 21vh, 360px);
+  background: var(--white);
+  border-radius: 14px;
+}
+.device-traces[data-live="false"] { opacity: 0.55; }
+.device-scale { font-size: 13px; color: var(--fg-3); }
+
+.device-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: auto; }
+
+#ended-tip { margin-top: 12px; }
+
+.checks-failed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 2px solid #b3261e;
+  border-radius: 14px;
+  background: var(--white);
+  color: var(--ink);
+  max-width: 40em;
+}
+.checks-failed h2 { font-size: 18px; letter-spacing: -0.01em; color: #b3261e; }
+.checks-failed .check-text { font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+.checks-failed .check-fix { font-size: 14px; line-height: 1.4; color: var(--ink-2); overflow-wrap: anywhere; }
+
+@media (max-width: 760px) {
+  .device-steps { grid-template-columns: 1fr; }
+  .device-steps li { flex-direction: row; align-items: center; }
+  .device-steps img { width: 120px; flex: none; }
+}
+
+/* Calibration --------------------------------------------------------------- */
+
+.calib {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(100%, 1200px);
+  min-height: 0;
+  padding: 8px var(--gutter) 24px;
+  margin: 0 auto;
+}
+.calib-contact {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 1fr);
+  gap: 24px;
+  min-height: 0;
+}
+.calib-view { align-self: start; width: 100%; aspect-ratio: 1 / 1; max-height: 72vh; border-radius: 18px; }
+.calib-panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.calib h1 { font-size: clamp(28px, 4vw, 40px); }
+.contact-count { font: 700 26px/1.2 var(--display); letter-spacing: -0.02em; }
+.calib-note { font-size: 14px; color: var(--fg-3); }
+.calib-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 15px; }
+.calib-legend li { display: inline-flex; align-items: center; gap: 7px; }
+.swatch { width: 12px; height: 12px; border-radius: 50%; flex: none; box-shadow: 0 0 0 1px rgba(18, 24, 38, 0.25); }
+.contact-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.contact-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--white);
+  color: var(--ink);
+  font: 600 14px var(--sans);
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px #d3d9e6;
+}
+.contact-pill:hover { box-shadow: inset 0 0 0 2px var(--cobalt); }
+.calib-excluded { font-size: 15px; color: var(--fg-2); }
+.calib-off {
+  padding: 12px 16px;
+  border-left: 5px solid var(--amber);
+  background: var(--white);
+  border-radius: 0 12px 12px 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink);
+  max-width: 40em;
+}
+.calib-timed {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+.calib-timed h1 { font-size: clamp(36px, 6vw, 64px); }
+.calib-timed > p { font-size: 18px; color: var(--fg-2); max-width: 32em; }
+.calib-cross { width: 120px; height: 120px; color: var(--fg); }
+.blink-cue {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--track);
+  transition: background-color 0.06s linear;
+}
+.blink-cue[data-on="true"] { background: var(--cobalt); }
+.calib-left { font-size: 14px; color: var(--fg-3); font-variant-numeric: tabular-nums; }
+.calib-done { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+.calib-done p { font-size: 18px; color: var(--fg-2); max-width: 32em; }
+.calib-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+
+@media (max-width: 760px) {
+  .calib-contact { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .blink-cue { transition: none; }
+}

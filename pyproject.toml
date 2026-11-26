@@ -1,0 +1,48 @@
+[build-system]
+requires = ["maturin>=1.9.4,<2"]
+build-backend = "maturin"
+
+[project]
+name = "open-cognionics"
+description = "Platform independent library for streaming and recording Cognionics (CGX) EEG data"
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = ["numpy"]
+dynamic = ["version"]
+
+[dependency-groups]
+dev = ["pytest", "mne", "maturin>=1.9.4,<2", "psutil", "brain-mapper", "playwright"]
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.7.7",
+    "mkdocstrings[python]>=1.0.6",
+]
+
+[tool.maturin]
+python-source = "python"
+module-name = "open_cognionics._core"
+features = ["python"]
+
+[tool.uv.workspace]
+members = ["brain_mapper"]
+
+[tool.uv.sources]
+brain-mapper = { workspace = true }
+
+[tool.uv]
+# Rebuild the extension module when the Rust sources change.
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "Cargo.toml" },
+    { file = "Cargo.lock" },
+    { file = "build.rs" },
+    { file = "src/**/*.rs" },
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/python", "tests/brain_mapper"]
+# Remove each test's tmp_path after the run, also for failed tests.
+tmp_path_retention_policy = "none"
+markers = [
+    "network: needs the internet (the embedded Vimeo player of the video round); run, never skipped",
+]

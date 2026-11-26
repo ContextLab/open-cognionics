@@ -1,0 +1,21 @@
+[
+  {"id": "participant", "kind": "setup", "title": "Participant", "blocks": []},
+  {
+    "id": "words",
+    "kind": "task",
+    "title": "Words",
+    "may_finish_early": true,
+    "blocks": [
+      {"id": "list1", "seconds": 64, "points": 100},
+      {"id": "list2", "seconds": 64, "points": 100}
+    ]
+  },
+  {
+    "id": "recall",
+    "kind": "recall",
+    "title": "Delayed free recall",
+    "may_finish_early": true,
+    "blocks": [{"id": "recall", "seconds": 20, "points": 100}]
+  },
+  {"id": "summary", "kind": "summary", "title": "Summary", "blocks": []}
+]

@@ -1,0 +1,13 @@
+[
+  {"id": "participant", "kind": "setup", "title": "Participant", "blocks": []},
+  {
+    "id": "nback",
+    "kind": "task",
+    "title": "2-back",
+    "blocks": [
+      {"id": "block1", "seconds": 50, "points": 100},
+      {"id": "block2", "seconds": 3, "points": 100}
+    ]
+  },
+  {"id": "summary", "kind": "summary", "title": "Summary", "blocks": []}
+]

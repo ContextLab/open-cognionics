@@ -1,0 +1,166 @@
+[
+  {
+    "id": "participant",
+    "kind": "setup",
+    "title": "Participant",
+    "blocks": []
+  },
+  {
+    "id": "device",
+    "kind": "setup",
+    "title": "Device setup",
+    "blocks": []
+  },
+  {
+    "id": "calibration",
+    "kind": "setup",
+    "title": "Calibration",
+    "blocks": []
+  },
+  {
+    "id": "words",
+    "kind": "task",
+    "title": "Words",
+    "module": null,
+    "blocks": [
+      {
+        "id": "list1",
+        "seconds": 2,
+        "points": 100
+      },
+      {
+        "id": "list2",
+        "seconds": 2,
+        "points": 100
+      }
+    ]
+  },
+  {
+    "id": "perception",
+    "kind": "task",
+    "title": "Perception",
+    "module": null,
+    "blocks": [
+      {
+        "id": "block1",
+        "seconds": 2,
+        "points": 100
+      },
+      {
+        "id": "block2",
+        "seconds": 2,
+        "points": 100
+      }
+    ]
+  },
+  {
+    "id": "nback",
+    "kind": "task",
+    "title": "2-back",
+    "module": null,
+    "blocks": [
+      {
+        "id": "block1",
+        "seconds": 2,
+        "points": 100
+      },
+      {
+        "id": "block2",
+        "seconds": 2,
+        "points": 100
+      }
+    ]
+  },
+  {
+    "id": "flanker",
+    "kind": "task",
+    "title": "Flanker",
+    "module": null,
+    "blocks": [
+      {
+        "id": "block1",
+        "seconds": 2,
+        "points": 100
+      },
+      {
+        "id": "block2",
+        "seconds": 2,
+        "points": 100
+      }
+    ]
+  },
+  {
+    "id": "spatial",
+    "kind": "task",
+    "title": "Spatial memory",
+    "module": null,
+    "blocks": [
+      {
+        "id": "block1",
+        "seconds": 2,
+        "points": 100
+      },
+      {
+        "id": "block2",
+        "seconds": 2,
+        "points": 100
+      }
+    ]
+  },
+  {
+    "id": "video",
+    "kind": "video",
+    "title": "Video",
+    "module": null,
+    "blocks": [
+      {
+        "id": "video",
+        "seconds": 2,
+        "points": 100
+      }
+    ]
+  },
+  {
+    "id": "rest_closed",
+    "kind": "rest",
+    "title": "Rest, eyes closed",
+    "blocks": [
+      {
+        "id": "rest",
+        "seconds": 2,
+        "points": 100
+      }
+    ]
+  },
+  {
+    "id": "rest_open",
+    "kind": "rest",
+    "title": "Rest, eyes open",
+    "blocks": [
+      {
+        "id": "rest",
+        "seconds": 2,
+        "points": 100
+      }
+    ]
+  },
+  {
+    "id": "recall",
+    "kind": "recall",
+    "title": "Delayed free recall",
+    "module": null,
+    "blocks": [
+      {
+        "id": "recall",
+        "seconds": 2,
+        "points": 100
+      }
+    ]
+  },
+  {
+    "id": "summary",
+    "kind": "summary",
+    "title": "Summary",
+    "blocks": []
+  }
+]

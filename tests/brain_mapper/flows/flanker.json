@@ -1,0 +1,13 @@
+[
+  {"id": "participant", "kind": "setup", "title": "Participant", "blocks": []},
+  {
+    "id": "flanker",
+    "kind": "task",
+    "title": "Flanker",
+    "blocks": [
+      {"id": "block1", "seconds": 50, "points": 100},
+      {"id": "block2", "seconds": 50, "points": 100}
+    ]
+  },
+  {"id": "summary", "kind": "summary", "title": "Summary", "blocks": []}
+]

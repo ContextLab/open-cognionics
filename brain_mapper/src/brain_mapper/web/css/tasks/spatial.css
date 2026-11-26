@@ -1,0 +1,69 @@
+/* Spatial memory (web/js/tasks/spatial.js): a square 5 x 5 grid in the shared stimulus area
+   (.task-panel, no ground of its own), sized from --panel. The squares are white outlines on the
+   page's navy ground; the squares to remember are filled white; the probe square has a thicker
+   outline and a glow, and no fill of its own (so it never looks filled). */
+
+.spatial-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  gap: calc(var(--panel) * 0.018);
+  width: calc(var(--panel) * 0.86);
+  height: calc(var(--panel) * 0.86);
+}
+
+.spatial-cell {
+  position: relative;
+  background: transparent;
+  border: max(2px, calc(var(--panel) * 0.004)) solid var(--stim);
+  border-radius: 8%;
+}
+
+/* A square of the stimulus grid over the background grid: the page's own navy, so that the
+   center square hides the cross under it without showing a box. */
+.spatial-over .spatial-cell { background: var(--stim-ground); }
+
+.spatial-cell[data-lit="true"],
+.spatial-over .spatial-cell[data-lit="true"] {
+  background: var(--stim);
+  border-color: var(--stim);
+}
+
+/* The probe: a thicker outline and a steady glow; the inside stays the page's navy. */
+.spatial-cell[data-probe="true"] {
+  border-width: max(5px, calc(var(--panel) * 0.012));
+  box-shadow: 0 0 calc(var(--panel) * 0.035) calc(var(--panel) * 0.008) var(--stim-glow);
+}
+
+.spatial-fixation {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.spatial-fixation {
+  font-family: var(--sans);
+  font-size: calc(var(--panel) * 0.09);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--stim);
+}
+
+/* The stimulus layer: fills the stimulus area like the background layer, so its grid lies exactly over
+   the background grid. */
+.spatial-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* A square of the stimulus grid with nothing on it: the background grid shows through. */
+.spatial-slot {
+  visibility: hidden;
+}

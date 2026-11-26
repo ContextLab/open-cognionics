@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>brain-mapper 3-D views (development page)</title>
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/shell.css">
+<link rel="stylesheet" href="/static/css/scene.css">
+<style>
+  body { overflow: hidden; }
+  .dev { height: 100vh; height: 100dvh; display: grid; grid-template-columns: minmax(0, 1fr) 320px; }
+  .dev .side { padding: 20px; display: flex; flex-direction: column; gap: 14px; background: var(--navy); border-left: 1px solid var(--navy-3); overflow-y: auto; }
+  .dev h1 { font-size: 22px; }
+  .dev p { color: var(--on-navy-1); font-size: 14px; }
+  .dev .pills, .dev .conditions { display: flex; flex-wrap: wrap; gap: 6px; }
+  .dev .pill, .dev .conditions button { font: 600 12px var(--sans); color: #fff; background: transparent; padding: 5px 10px; border-radius: 999px; border: 2px solid var(--navy-3); cursor: pointer; }
+  .dev .conditions button[aria-pressed="true"] { background: #fff; color: var(--navy); }
+  @media (max-width: 760px) {
+    .dev { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+    .dev .side { border-left: 0; border-top: 1px solid var(--navy-3); max-height: 38vh; }
+  }
+</style>
+</head>
+<body data-ground="dark">
+<div class="dev">
+  <div id="stage"></div>
+  <div class="side">
+    <h1 id="title"></h1>
+    <p id="info"></p>
+    <div class="pills" id="pills" hidden></div>
+    <div class="conditions" id="conditions" role="group" aria-label="Sample condition" hidden></div>
+  </div>
+</div>
+<script type="module">
+// Opened with ?test=1 the page exposes window.__scene for the browser tests (the views, their
+// stage and headset, counts of what is drawn, and `status`: loading, ready, failed, or
+// unsupported when the browser cannot draw WebGL; `ready` is true only for "ready").
+const params = new URLSearchParams(location.search);
+const view = params.get("view") === "network" ? "network" : "fit";
+const hook = { view, ready: false, status: "loading", error: null };
+if (params.get("test") === "1") window.__scene = hook;
+const stage = document.getElementById("stage");
+const info = document.getElementById("info");
+
+function fail(text) {
+  hook.status = "failed";
+  hook.ready = false;
+  hook.error = `Could not load the 3-D view: ${text}`;
+  stage.classList.add("scene3d");
+  const note = document.createElement("div");
+  note.className = "scene-message";
+  note.setAttribute("role", "alert");
+  note.textContent = hook.error;
+  stage.appendChild(note);
+}
+
+async function getJson(name) {
+  try {
+    const response = await fetch(`/static/assets/${name}`);
+    if (!response.ok) throw new Error(`the server answered ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    throw new Error(`${name} could not be loaded (${error.message})`);
+  }
+}
+
+try {
+  let modules;
+  try {
+    modules = await Promise.all([
+      import("/static/js/scene3d/fit-view.js"),
+      import("/static/js/scene3d/network-view.js"),
+    ]);
+  } catch (error) {
+    throw new Error(`the 3-D code could not be loaded (${error.message})`);
+  }
+  const [{ createFitView }, { createNetworkView }] = modules;
+  const [meshes, contacts, network] = await Promise.all([
+    getJson("meshes.json"),
+    getJson("sample-contacts.json"),
+    getJson("sample-network.json"),
+  ]);
+  hook.meshes = meshes;
+  hook.contactNames = () => hook.fit.headset.contacts.map((c) => c.name);
+
+  if (view === "fit") {
+    document.getElementById("title").textContent = "Settle the headset until the contacts turn green.";
+    const fit = createFitView(stage, meshes);
+    hook.fit = fit;
+    if (!fit.unavailable) {
+      fit.setStates(contacts);
+      fit.setSample(true);
+      const pills = document.getElementById("pills");
+      pills.hidden = false;
+      const words = { marginal: "weak", bad: "no contact" };
+      for (const [name, state] of Object.entries(contacts)) {
+        if (state === "good" || !words[state] || !fit.headset.contacts.some((c) => c.name === name)) continue;
+        const pill = document.createElement("button");
+        pill.type = "button";
+        pill.className = "pill";
+        pill.dataset.name = name;
+        pill.textContent = `${name}: ${words[state]}`;
+        pill.addEventListener("click", () => fit.focus(name));
+        pills.appendChild(pill);
+      }
+      info.textContent = "Sample data: made-up contact states. The head and brain are stand-ins.";
+    }
+  } else {
+    document.getElementById("title").textContent = "Your brain's network, right now.";
+    const net = createNetworkView(stage, meshes, {
+      onSelect(i, d) {
+        info.textContent = d
+          ? `This region has ${d.links} strong links and belongs to a group of ${d.group} regions. Tap empty space to show everything again.`
+          : "Sample data: colours mark groups of regions working together. Tap a region to see only its links.";
+      },
+    });
+    hook.network = net;
+    if (!net.unavailable) {
+      net.setSample(true);
+      net.setNetwork(network);
+      const box = document.getElementById("conditions");
+      box.hidden = false;
+      const choices = [["Film", network.alternatives["2"]], ["Eyes open", network.communities], ["Eyes closed", network.alternatives["5"]]];
+      choices.forEach(([label, communities], k) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = label;
+        b.setAttribute("aria-pressed", String(k === 1));
+        b.addEventListener("click", () => {
+          box.querySelectorAll("button").forEach((o) => o.setAttribute("aria-pressed", String(o === b)));
+          net.setNetwork({ ...network, communities });
+        });
+        box.appendChild(b);
+      });
+    }
+  }
+  const view3d = view === "fit" ? hook.fit : hook.network;
+  if (view3d && view3d.unavailable) {
+    // the view put its own message on the page (no WebGL); the page is not ready
+    hook.status = "unsupported";
+    hook.ready = false;
+  } else {
+    hook.status = "ready";
+    hook.ready = true;
+  }
+} catch (error) {
+  fail(error.message);
+}
+</script>
+</body>
+</html>

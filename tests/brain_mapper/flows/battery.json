@@ -1,0 +1,40 @@
+[
+  {"id": "participant", "kind": "setup", "title": "Participant", "blocks": []},
+  {
+    "id": "words",
+    "kind": "task",
+    "title": "Words",
+    "blocks": [{"id": "list1", "seconds": 64, "points": 100}]
+  },
+  {
+    "id": "perception",
+    "kind": "task",
+    "title": "Perception",
+    "blocks": [{"id": "block1", "seconds": 10, "points": 100}]
+  },
+  {
+    "id": "nback",
+    "kind": "task",
+    "title": "2-back",
+    "blocks": [{"id": "block1", "seconds": 12, "points": 100}]
+  },
+  {
+    "id": "flanker",
+    "kind": "task",
+    "title": "Flanker",
+    "blocks": [{"id": "block1", "seconds": 10, "points": 100}]
+  },
+  {
+    "id": "spatial",
+    "kind": "task",
+    "title": "Spatial memory",
+    "blocks": [{"id": "block1", "seconds": 12, "points": 100}]
+  },
+  {
+    "id": "recall",
+    "kind": "recall",
+    "title": "Delayed free recall",
+    "blocks": [{"id": "recall", "seconds": 12, "points": 100}]
+  },
+  {"id": "summary", "kind": "summary", "title": "Summary", "blocks": []}
+]

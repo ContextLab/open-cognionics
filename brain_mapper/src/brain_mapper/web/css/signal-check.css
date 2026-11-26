@@ -1,0 +1,31 @@
+/* The signal check on the calibration screen (js/screens/signal-check.js). */
+.signal-panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.signal-headline { font-size: clamp(20px, 1.6vw, 28px); }
+.signal-left { font: 700 clamp(28px, 3vw, 48px)/1 var(--display); font-variant-numeric: tabular-nums; }
+.signal-left:empty { display: none; }
+.signal-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+  gap: 4px 16px;
+  font-size: clamp(14px, 1vw, 17px);
+}
+.signal-list li { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 2px 0; }
+.signal-list li.is-off { font-weight: 700; }
+.signal-name { min-width: 3em; font-weight: 700; }
+.signal-words { color: var(--fg-2); }
+/* The full list behind "All channels": each status in full (no cut-off words). */
+.signal-all { min-width: 0; }
+.signal-all summary { cursor: pointer; font-weight: 600; color: var(--fg-2); }
+.signal-all[open] summary { margin-bottom: 8px; }
+.signal-all:not([open]) > :not(summary) { display: none; }
+.signal-list li.is-off .signal-words { color: var(--fg); }
+/* The contact panel and this one take each other's place beside the fit view. */
+.calib-panel[hidden], .signal-panel[hidden], .signal-warn[hidden], .signal-all[hidden] { display: none; }
+/* Low windows: the open list is drawn tighter so the screen still fits (1024 x 768). */
+@media (max-height: 820px) {
+  .signal-list li { padding: 0; line-height: 1.2; }
+  .signal-panel { gap: 8px; }
+}

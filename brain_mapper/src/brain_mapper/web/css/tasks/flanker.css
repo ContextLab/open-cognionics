@@ -1,0 +1,26 @@
+/* The flanker task (web/js/tasks/flanker.js): a square field filling the shared stimulus area
+   (`.task-panel`, side `--panel`, no ground of its own) that holds the fixation cross, the five
+   arrows (SVG shapes) or the practice feedback. The arrows and the cross are white (--stim) on
+   the page's navy ground. */
+
+.flanker-field {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flanker-svg { width: 100%; height: 100%; display: block; }
+.flanker-ink { fill: var(--stim); }
+
+/* The example row on the instruction screen only: five white arrows, the middle one marked. */
+.task[data-task="flanker"] .task-example { gap: 10px clamp(8px, 1.5vmin, 28px); }
+.task[data-task="flanker"] .task-example li { min-width: 0; }
+.flanker-example-arrow { width: clamp(56px, 7vmin, 120px); height: auto; display: block; }
+.task[data-task="flanker"] .task-example li:nth-child(3) .task-example-top {
+  padding: 6px;
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 3px var(--stim);
+}
+.task[data-task="flanker"] .task-example li:nth-child(3) .task-example-bottom { color: var(--stim); font-weight: 700; }

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "participant",
+    "kind": "setup",
+    "title": "Participant",
+    "blocks": []
+  },
+  {
+    "id": "device",
+    "kind": "setup",
+    "title": "Device setup",
+    "blocks": []
+  },
+  {
+    "id": "rest_closed",
+    "kind": "rest",
+    "title": "Rest, eyes closed",
+    "blocks": [
+      {
+        "id": "rest",
+        "seconds": 40,
+        "points": 100
+      }
+    ]
+  },
+  {
+    "id": "summary",
+    "kind": "summary",
+    "title": "Summary",
+    "blocks": []
+  }
+]

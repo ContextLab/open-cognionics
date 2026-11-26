@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Channel order check</title>
+<style>
+  :root { --paper: #eef3ea; --ink: #1c2a39; --ink-soft: #55677a; --pen: #b3204f; --ok: #1f6f4a; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.45 "Avenir Next", "Segoe UI", sans-serif; }
+  main { display: grid; grid-template-columns: 420px 1fr; gap: 32px; padding: 24px 32px; max-width: 1200px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  #say { font-size: 34px; font-weight: 600; min-height: 90px; margin: 18px 0 6px; }
+  #say.go { color: var(--pen); }
+  #sub { color: var(--ink-soft); min-height: 24px; }
+  button { font: inherit; padding: 10px 18px; border: 1.5px solid var(--ink); background: #fff; border-radius: 3px; cursor: pointer; }
+  button:disabled { opacity: .4; cursor: default; }
+  canvas { background: #fff; border: 1.5px solid var(--ink); border-radius: 3px; }
+  table { border-collapse: collapse; font-variant-numeric: tabular-nums; font-size: 14px; }
+  th, td { text-align: left; padding: 3px 12px 3px 0; border-bottom: 1px solid #c9d3c4; }
+  td.ok { color: var(--ok); font-weight: 600; } td.no { color: var(--pen); font-weight: 600; }
+  #link { color: var(--ink-soft); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <section>
+    <h1>Channel order check</h1>
+    <div id="link">connecting…</div>
+    <div id="say">Ready when you are</div>
+    <div id="sub">For each electrode: hands off while it says “get ready”, then gently press and wiggle the highlighted electrode with one fingertip until the next prompt. Keep the rest of your head still. About 2 minutes.</div>
+    <p><button id="start" disabled>Start check</button></p>
+    <canvas id="head" width="400" height="400"></canvas>
+  </section>
+  <section>
+    <table>
+      <thead><tr><th>Asked</th><th>Biggest movement</th><th>×</th><th>Biggest tone change</th><th>×</th><th>Match</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </section>
+</main>
+<script>
+const ring = d => [0.85 * Math.sin(d * Math.PI / 180), 0.85 * Math.cos(d * Math.PI / 180)];
+const POS = {
+  Fp1: ring(-18), Fp2: ring(18), F7: ring(-54), F8: ring(54), T3: ring(-90), T4: ring(90),
+  P7: ring(-126), P8: ring(126), O1: ring(-162), O2: ring(162),
+  Fz: [0, 0.425], Cz: [0, 0], Pz: [0, -0.425], C3: [-0.425, 0], C4: [0.425, 0],
+  F3: [-0.38, 0.47], F4: [0.38, 0.47], P3: [-0.38, -0.47], P4: [0.38, -0.47], A2: [1.0, -0.17],
+};
+const READY_S = 2.5, TAP_S = 4;
+let fs = 500, labels = [], socket, buf = [], target = null;   // buf: {i, x[]} for the last ~20 s
+const $ = id => document.getElementById(id);
+
+// Status of the link: the text of the current link error (null while live).
+// A note replaces it for five seconds, then whatever is current returns.
+let linkDown = null, noteTimer = null;
+function showLink() {
+  clearTimeout(noteTimer); noteTimer = null;
+  $("link").textContent = linkDown || "headset link live";
+  $("link").style.color = linkDown ? "var(--pen)" : "";
+}
+
+function connect() {
+  socket = new WebSocket(`ws://${location.hostname}:${Number(location.port) + 1}`);
+  socket.onopen = () => { linkDown = null; showLink(); };
+  socket.onclose = () => { linkDown = "link lost, retrying"; showLink(); setTimeout(connect, 1000); };
+  socket.onmessage = e => {
+    const m = JSON.parse(e.data);
+    if (m.t === "hello") {
+      fs = m.fs; labels = m.labels; buf = [];
+      linkDown = null; showLink();
+      $("start").disabled = false; draw();
+    }
+    if (m.t === "error") {
+      if (m.kind === "note") {
+        $("link").textContent = m.msg; $("link").style.color = "var(--pen)";
+        clearTimeout(noteTimer);
+        noteTimer = setTimeout(showLink, 5000);
+      } else { linkDown = m.msg; showLink(); $("start").disabled = true; }
+    }
+    if (m.t === "d") {
+      m.x.forEach((row, k) => buf.push({ i: m.i + k, x: row }));
+      if (buf.length > fs * 20) buf.splice(0, buf.length - fs * 20);
+    }
+  };
+}
+const send = o => socket.send(JSON.stringify(o));
+const mark = label => send({ cmd: "mark", label });
+const wait = s => new Promise(r => setTimeout(r, s * 1000));
+const lastIndex = () => buf.length ? buf[buf.length - 1].i : 0;
+
+function beep(f = 880, d = 0.12) {
+  const a = beep.ctx || (beep.ctx = new AudioContext()), o = a.createOscillator(), g = a.createGain();
+  o.frequency.value = f; g.gain.value = 0.15; o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime + d);
+}
+
+// Per channel: amplitude of the 125 Hz (fs/4) contact tone, and size of everything else.
+function measure(from, to) {
+  const seg = buf.filter(s => s.i >= from && s.i < to), n = seg.length, nch = labels.length;
+  const tone = new Array(nch).fill(0), move = new Array(nch).fill(0);
+  if (n < 16) return { tone, move };
+  for (let c = 0; c < nch; c++) {
+    let I = 0, Q = 0, acc = 0, cnt = 0, prev = null;
+    for (let k = 0; k < n; k++) {
+      const ph = seg[k].i & 3, v = seg[k].x[c];
+      I += v * [1, 0, -1, 0][ph]; Q += v * [0, 1, 0, -1][ph];
+      if (k >= 7) {                      // difference of two 4-sample means: tone and offset cancel
+        let a = 0, b = 0;
+        for (let j = 0; j < 4; j++) { a += seg[k - j].x[c]; b += seg[k - 4 - j].x[c]; }
+        const d = (a - b) / 4; acc += d * d; cnt++;
+      }
+    }
+    tone[c] = 2 * Math.hypot(I, Q) / n;
+    move[c] = Math.sqrt(acc / Math.max(cnt, 1));
+  }
+  return { tone, move };
+}
+function winner(after, before, mode) {
+  let best = 0, bestR = 0;
+  after.forEach((v, c) => {
+    let r = (v + 1e-6) / (before[c] + 1e-6);
+    if (mode === "tone") r = Math.max(r, 1 / r);       // a tone change either way counts
+    if (r > bestR) { bestR = r; best = c; }
+  });
+  return [best, bestR];
+}
+
+function draw() {
+  const cv = $("head"), g = cv.getContext("2d"), R = 150, cx = 200, cy = 205;
+  g.clearRect(0, 0, 400, 400);
+  g.strokeStyle = "#1c2a39"; g.lineWidth = 1.5;
+  g.beginPath(); g.arc(cx, cy, R * 0.92, 0, 7); g.stroke();
+  g.beginPath(); g.moveTo(cx - 14, cy - R * 0.91); g.lineTo(cx, cy - R * 1.04); g.lineTo(cx + 14, cy - R * 0.91); g.stroke();
+  g.font = "12px sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+  for (const l of labels) {
+    const p = POS[l]; if (!p) continue;
+    const x = cx + p[0] * R, y = cy - p[1] * R, on = l === target;
+    g.beginPath(); g.arc(x, y, on ? 20 : 13, 0, 7);
+    g.fillStyle = on ? "#b3204f" : "#fff"; g.fill(); g.stroke();
+    g.fillStyle = on ? "#fff" : "#1c2a39"; g.fillText(l, x, y);
+  }
+  g.fillStyle = "#55677a"; g.fillText("nose", cx, 14);
+}
+
+async function run() {
+  $("start").disabled = true; $("rows").innerHTML = "";
+  send({ cmd: "impedance", on: false });
+  mark("order_check_start");
+  $("say").className = ""; $("say").textContent = "Checking signals… sit still, hands off"; await wait(5);
+  const rest = measure(lastIndex() - fs * 3, lastIndex()).move.slice().sort((a, b) => a - b);
+  const typical = rest[Math.floor(rest.length / 2)];
+  mark(`order_rest_quality ${typical.toFixed(1)}`);
+  if (typical > 25) {
+    $("say").textContent = "Signals are too noisy to test";
+    $("sub").textContent = `Typical movement at rest is ${typical.toFixed(0)} µV (needs to be under 25). Reseat the headset, especially the reference and ground contacts, then press Start again.`;
+    $("start").disabled = false; return;
+  }
+  $("sub").textContent = `Signals look steady (${typical.toFixed(0)} µV at rest). For each electrode: hands off on “get ready”, then press it gently and wiggle it a little until the next prompt.`;
+  const result = [];
+  for (const l of labels) {
+    target = l; draw();
+    $("say").className = ""; $("say").textContent = `Get ready: ${l}`;
+    const b0 = lastIndex(); mark(`order_${l}_ready`);
+    await wait(READY_S);
+    const t0 = lastIndex(); mark(`order_${l}_start`); beep();
+    $("say").className = "go"; $("say").textContent = `Press and wiggle ${l}`;
+    await wait(TAP_S);
+    const t1 = lastIndex(); mark(`order_${l}_end`);
+    const base = measure(b0 + fs * 0.5, t0), act = measure(t0 + fs * 0.5, t1);
+    const [mc, mr] = winner(act.move, base.move, "move"), [tc, tr] = winner(act.tone, base.tone, "tone");
+    const ok = labels[mc] === l;
+    result.push({ asked: l, move: labels[mc], move_ch: mc, move_x: +mr.toFixed(1), tone: labels[tc], tone_ch: tc, tone_x: +tr.toFixed(1) });
+    const tr_ = document.createElement("tr");
+    tr_.innerHTML = `<td>${l}</td><td>${labels[mc]} (ch ${mc})</td><td>${mr.toFixed(1)}</td><td>${labels[tc]} (ch ${tc})</td><td>${tr.toFixed(1)}</td><td class="${ok ? "ok" : "no"}">${ok ? "yes" : "no"}</td>`;
+    $("rows").appendChild(tr_);
+  }
+  target = null; draw(); beep(660, 0.3);
+  mark("order_result " + JSON.stringify(result));
+  mark("order_check_end");
+  const n = result.filter(r => r.move === r.asked).length;
+  $("say").className = ""; $("say").textContent = `Done: ${n} of ${labels.length} matched`;
+  $("start").disabled = false;
+}
+$("start").onclick = run;
+connect();
+</script>
+</body>
+</html>

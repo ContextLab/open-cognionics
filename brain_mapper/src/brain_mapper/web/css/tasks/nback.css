@@ -1,0 +1,49 @@
+/* The 2-back task (web/js/tasks/nback.js), drawn in the shared stimulus area (`.task-panel`, no
+   ground of its own: white letters on the page's navy) in units of its side, --panel. The
+   fixation cross is the area's own content while it is empty during the trials: it comes on in
+   the frame that takes a letter off and goes when the next letter is drawn. It is not shown
+   under the pause overlay, the Enter prompt or the blank stage after the trials. */
+
+.task[data-task="nback"] .task-panel:empty::after {
+  content: "+";
+  color: var(--stim);
+  font-size: calc(var(--panel) * 0.2);
+  font-weight: 400;
+  line-height: 1;
+}
+
+#screen[data-phase="paused"] .task[data-task="nback"] .task-panel:empty::after { content: none; }
+/* Nor under the Enter prompt, nor once the block's trials are over (the stage is blank). */
+.task[data-task="nback"][data-ready="practice"] .task-panel:empty::after,
+.task[data-task="nback"][data-ready="block"] .task-panel:empty::after,
+.task[data-task="nback"][data-mode="over"] .task-panel:empty::after { content: none; }
+
+.nback-letter { font-size: calc(var(--panel) * 0.45); font-weight: 700; line-height: 1; color: var(--stim); }
+
+/* The worked example on the instruction screen: from the third letter on, a bracket over the row
+   joins each letter to the letter two positions earlier (the pair compared). The cells have one
+   width, so a bracket spans two cells and two gaps; brackets of neighboring letters are drawn at
+   two heights so they do not overlap. */
+.task[data-task="nback"] .task-example {
+  --cell: 6.4em;
+  --gap: 18px;
+  --rise: clamp(14px, 2vmin, 32px);
+  gap: 10px var(--gap);
+  flex-wrap: nowrap;
+  margin-top: calc(var(--rise) * 2 + 8px);
+}
+.task[data-task="nback"] .task-example li { position: relative; width: var(--cell); min-width: 0; font-size: clamp(16px, max(16px, 2.6vmin - 12px), 30px); }
+.task[data-task="nback"] .task-example-bottom { font-size: 1em; text-align: center; }
+.task[data-task="nback"] .task-example li:nth-child(n + 3)::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 50%;
+  width: calc(2 * (var(--cell) + var(--gap)));
+  height: var(--rise);
+  border: 2px solid var(--fg-2);
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  pointer-events: none;
+}
+.task[data-task="nback"] .task-example li:nth-child(even)::before { height: calc(var(--rise) * 2); border-style: dashed; }

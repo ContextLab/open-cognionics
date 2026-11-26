@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>brain-mapper</title>
+<link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/shell.css">
+<link rel="stylesheet" href="/static/css/scene.css">
+<link rel="stylesheet" href="/static/css/video.css">
+<link rel="stylesheet" href="/static/css/results.css">
+<link rel="stylesheet" href="/static/css/layout.css">
+<link rel="stylesheet" href="/static/css/tasks/flanker.css">
+<link rel="stylesheet" href="/static/css/tasks/nback.css">
+<link rel="stylesheet" href="/static/css/tasks/spatial.css">
+<link rel="stylesheet" href="/static/css/tasks/words.css">
+<script type="module" src="/static/js/app.js"></script>
+</head>
+<body data-ground="dark">
+<div id="app">
+  <header id="hud" hidden>
+    <div id="hud-label"></div>
+    <div class="hud-mid">
+      <div id="hud-progress" role="progressbar" aria-label="Progress through the session" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+      <div id="hud-progress-text"></div>
+    </div>
+    <div class="hud-right">
+      <div id="hud-points">—</div>
+      <div class="hud-caption">points earned of possible, updated after each trial</div>
+    </div>
+  </header>
+  <main id="screen" data-screen="connecting" data-step="" data-phase=""></main>
+  <section id="fs-lost" role="alertdialog" aria-labelledby="fs-lost-title" hidden>
+    <div class="card">
+      <h2 id="fs-lost-title">Paused</h2>
+      <p id="fs-lost-why"></p>
+      <p class="left" id="fs-lost-left"></p>
+      <p class="left" id="fs-lost-tip" hidden></p>
+      <p id="fs-signal" role="status" hidden></p>
+      <p class="left" id="fs-signal-warn" hidden></p>
+      <div class="fs-actions">
+        <button class="btn" id="fs-return" type="button">Return to full screen</button>
+        <button class="btn btn--ghost" id="fs-check" type="button">Check the headset</button>
+      </div>
+      <p class="left" id="fs-wait" hidden>Waiting for the headset</p>
+      <div id="fs-leave-slot"></div>
+    </div>
+    <div class="card hc" id="fs-check-panel" hidden>
+      <div id="hc-slot"></div>
+      <div class="hc-actions">
+        <button class="btn" id="hc-done" type="button">Done</button>
+        <p class="hc-hint">Done goes back to the paused screen.</p>
+      </div>
+    </div>
+  </section>
+  <div id="notice" role="status" hidden></div>
+  <div id="conn-lost" role="alert" hidden>Lost the connection to brain-mapper. Trying again.</div>
+</div>
+</body>
+</html>

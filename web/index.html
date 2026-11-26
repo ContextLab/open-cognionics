@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick-20 session</title>
+<style>
+  :root {
+    --paper: #eef3ea;
+    --grid: #cbd9c8;
+    --grid-strong: #a9bfa6;
+    --ink: #1c2a39;
+    --ink-soft: #55677a;
+    --pen: #b3204f;
+    --good: #2f7d5b;
+    --panel: #f7faf4;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font: 15px/1.45 "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+    font-variant-numeric: tabular-nums;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    min-height: 100vh;
+  }
+  header {
+    display: flex; flex-wrap: wrap; gap: 6px 22px; align-items: center;
+    padding: 10px 20px; border-bottom: 2px solid var(--ink);
+  }
+  header h1 { font-size: 17px; margin: 0 14px 0 0; font-weight: 700; letter-spacing: 0.01em; }
+  .stat { color: var(--ink-soft); }
+  .stat b { color: var(--ink); font-weight: 600; }
+  .stat.bad b { color: var(--pen); }
+  header .spacer { flex: 1; }
+  button, select {
+    font: inherit; color: var(--ink); background: var(--panel);
+    border: 1.5px solid var(--ink); border-radius: 3px; padding: 6px 12px; cursor: pointer;
+  }
+  button:hover { background: #fff; }
+  button:focus-visible, select:focus-visible { outline: 3px solid var(--pen); outline-offset: 2px; }
+  button.primary { background: var(--ink); color: var(--paper); }
+  button.primary:hover { background: #2b3e53; }
+  button[disabled] { opacity: 0.45; cursor: default; }
+
+  .top {
+    display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+    gap: 0; border-bottom: 2px solid var(--ink);
+  }
+  .guide { padding: 22px 26px 20px; display: flex; flex-direction: column; gap: 10px; min-height: 300px; }
+  #instruction {
+    font-family: "Avenir Next Condensed", "Avenir Next", "Arial Narrow", sans-serif;
+    font-weight: 700; font-size: clamp(40px, 6.2vw, 92px); line-height: 0.98; margin: 0;
+    letter-spacing: -0.01em; max-width: 14ch;
+  }
+  #detail { font-size: 18px; max-width: 46ch; margin: 0; color: var(--ink-soft); }
+  .guide .row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-top: auto; }
+  #countdown { font-size: 44px; font-weight: 700; min-width: 3ch; color: var(--pen); line-height: 1; }
+  #steps { display: flex; gap: 4px; flex: 1; min-width: 180px; }
+  #steps span { height: 8px; flex: 1; background: var(--grid); }
+  #steps span.done { background: var(--ink); }
+  #steps span.now { background: var(--pen); }
+
+  .map { border-left: 2px solid var(--ink); padding: 14px 18px; display: flex; flex-direction: column; gap: 6px; }
+  .map .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  #head { width: 100%; max-width: 360px; aspect-ratio: 1; align-self: center; }
+  #legend { display: flex; align-items: center; gap: 8px; color: var(--ink-soft); font-size: 13px; }
+  #ramp { flex: 1; height: 10px; border: 1px solid var(--ink); }
+
+  .chart { position: relative; min-height: 420px; }
+  #traces { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .chart .controls { position: absolute; right: 18px; top: 4px; display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-soft); }
+  .chart select { padding: 3px 6px; }
+
+  @media (max-width: 820px) {
+    .top { grid-template-columns: 1fr; }
+    .map { border-left: 0; border-top: 2px solid var(--ink); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Quick-20 session</h1>
+  <span class="stat" id="s-link">Link <b>connecting</b></span>
+  <span class="stat" id="s-rate">Rate <b>–</b></span>
+  <span class="stat" id="s-lost">Lost samples <b>0</b></span>
+  <span class="stat" id="s-bat">Battery <b>–</b></span>
+  <span class="stat" id="s-imp">Contact check <b>–</b></span>
+  <span class="spacer"></span>
+  <button id="b-imp">Turn contact check off</button>
+</header>
+
+<section class="top">
+  <div class="guide" aria-live="polite">
+    <p id="instruction">Fit the headset</p>
+    <p id="detail">Dark spots on the head map are electrodes with weak contact. Press them in or wiggle them through your hair until they lighten, then start the recording.</p>
+    <div class="row">
+      <span id="countdown"></span>
+      <div id="steps"></div>
+      <button class="primary" id="b-start">Start guided recording</button>
+    </div>
+  </div>
+  <div class="map">
+    <div class="row">
+      <label for="mode">Head map shows</label>
+      <select id="mode">
+        <option value="contact">Contact (125 Hz tone)</option>
+        <option value="alpha">Alpha, 8–13 Hz</option>
+        <option value="slow">Slow waves and blinks, 1–4 Hz</option>
+        <option value="broad">All activity, 1–45 Hz</option>
+      </select>
+    </div>
+    <canvas id="head" width="720" height="720" aria-label="Head map of the selected measure"></canvas>
+    <div id="legend"><span id="lo">–</span><canvas id="ramp" width="200" height="10"></canvas><span id="hi">–</span></div>
+  </div>
+</section>
+
+<section class="chart">
+  <canvas id="traces" aria-label="Live traces for each electrode"></canvas>
+  <div class="controls">
+    <label for="gain">Height of one row</label>
+    <select id="gain">
+      <option value="0" selected>Auto</option>
+      <option>20</option><option>50</option><option>100</option><option>200</option><option>500</option><option>2000</option>
+    </select>
+    <span>µV</span>
+  </div>
+</section>
+
+<script>
+"use strict";
+// Approximate 10-20 positions on a unit head (x to the right, y to the nose).
+const RING = 0.85, deg = Math.PI / 180;
+const ring = a => [RING * Math.sin(a * deg), RING * Math.cos(a * deg)];
+const POS = {
+  Fp1: ring(-18), Fp2: ring(18), F7: ring(-54), F8: ring(54), T3: ring(-90), T4: ring(90),
+  P7: ring(-126), P8: ring(126), O1: ring(-162), O2: ring(162),
+  Fz: [0, 0.425], Cz: [0, 0], Pz: [0, -0.425], C3: [-0.425, 0], C4: [0.425, 0],
+  F3: [-0.38, 0.47], F4: [0.38, 0.47], P3: [-0.38, -0.47], P4: [0.38, -0.47],
+  A2: [1.0, -0.17],
+};
+
+let fs = 500, labels = [], nch = 0, socket = null;
+const SECONDS = 8;
+let ringLen = 0, head = 0, total = 0, shown = [], chans = [];
+let impedanceOn = null, lastIndex = null, rateCount = 0, rateStart = performance.now();
+
+// ---- streaming filters ---------------------------------------------------
+function biquad(type, f0, q) {
+  const w = 2 * Math.PI * f0 / fs, a = Math.sin(w) / (2 * q), c = Math.cos(w);
+  let b0, b1, b2;
+  if (type === "band") { b0 = a; b1 = 0; b2 = -a; }
+  else if (type === "notch") { b0 = 1; b1 = -2 * c; b2 = 1; }
+  else { b0 = (1 + c) / 2; b1 = -(1 + c); b2 = (1 + c) / 2; } // high-pass
+  const a0 = 1 + a, a1 = -2 * c, a2 = 1 - a;
+  const s = { b0: b0 / a0, b1: b1 / a0, b2: b2 / a0, a1: a1 / a0, a2: a2 / a0, z1: 0, z2: 0 };
+  return x => { const y = s.b0 * x + s.z1; s.z1 = s.b1 * x - s.a1 * y + s.z2; s.z2 = s.b2 * x - s.a2 * y; return y; };
+}
+function meanSquare(seconds) { // exponential running mean of x^2
+  const k = 1 / (seconds * fs); let v = 0;
+  return x => (v += k * (x * x - v));
+}
+function makeChannel() {
+  const hp = biquad("high", 1, 0.707), mains = biquad("notch", 60, 8);
+  const bands = { alpha: biquad("band", 10.2, 2), slow: biquad("band", 2, 0.7) };
+  const ms = { alpha: meanSquare(2), slow: meanSquare(1), broad: meanSquare(2), contact: meanSquare(1) };
+  const last4 = [0, 0, 0, 0]; let k = 0, started = 0, offset = null;
+  const value = { alpha: 0, slow: 0, broad: 0, contact: 0 };
+  return {
+    value,
+    push(x) {
+      // Electrode offsets are thousands of times larger than EEG; removing the
+      // first sample's value keeps the high-pass from ringing for seconds.
+      if (offset === null) offset = x;
+      let y = mains(hp(x - offset));
+      if (started < fs / 2) { started++; y = 0; }
+      last4[k] = y; k = (k + 1) & 3;
+      // A 4-sample average removes the 125 Hz contact tone; what it removes is the tone itself.
+      const clean = (last4[0] + last4[1] + last4[2] + last4[3]) / 4;
+      const i = last4[k] - last4[(k + 2) & 3], q = last4[(k + 1) & 3] - last4[(k + 3) & 3];
+      value.contact = Math.sqrt(ms.contact(Math.hypot(i, q) / 2));
+      value.alpha = Math.sqrt(ms.alpha(bands.alpha(clean)));
+      value.slow = Math.sqrt(ms.slow(bands.slow(clean)));
+      value.broad = Math.sqrt(ms.broad(clean));
+      return clean;
+    },
+  };
+}
+
+// ---- connection ----------------------------------------------------------
+const $ = id => document.getElementById(id);
+const setStat = (id, text, bad) => { const el = $(id); el.querySelector("b").textContent = text; el.classList.toggle("bad", !!bad); };
+
+// Status of the link: the text of the current link error (null while live).
+// A note replaces it for five seconds, then whatever is current returns.
+let linkDown = null, noteTimer = null;
+function showLink() {
+  clearTimeout(noteTimer); noteTimer = null;
+  if (linkDown) setStat("s-link", linkDown, true); else setStat("s-link", "live");
+}
+
+function connect() {
+  socket = new WebSocket(`ws://${location.hostname}:${Number(location.port) + 1}`);
+  socket.onopen = () => { linkDown = null; showLink(); };
+  socket.onclose = () => { linkDown = "lost, retrying"; showLink(); setTimeout(connect, 1000); };
+  socket.onmessage = e => {
+    const m = JSON.parse(e.data);
+    if (m.t === "hello") {
+      linkDown = null; showLink();
+      fs = m.fs; labels = m.labels; nch = labels.length;
+      ringLen = Math.round(SECONDS * fs); head = 0; total = 0;
+      shown = labels.map(() => new Float32Array(ringLen));
+      chans = labels.map(makeChannel);
+    } else if (m.t === "error") {
+      if (m.kind === "note") {
+        setStat("s-link", m.msg, true);
+        clearTimeout(noteTimer);
+        noteTimer = setTimeout(showLink, 5000);
+      } else { linkDown = m.msg; showLink(); }
+    } else if (m.t === "d" && nch) {
+      for (const row of m.x) {
+        for (let c = 0; c < nch; c++) shown[c][head] = chans[c].push(row[c]);
+        head = (head + 1) % ringLen; total++;
+      }
+      rateCount += m.x.length;
+      setStat("s-lost", String(m.lost), m.lost > 0);
+      setStat("s-bat", m.bat.toFixed(2) + " V", m.bat < 3.5);
+      if (impedanceOn !== m.imp) {
+        impedanceOn = m.imp;
+        setStat("s-imp", m.imp ? "on" : "off");
+        $("b-imp").textContent = m.imp ? "Turn contact check off" : "Turn contact check on";
+      }
+    }
+  };
+}
+const send = o => socket && socket.readyState === 1 && socket.send(JSON.stringify(o));
+const mark = label => send({ cmd: "mark", label });
+$("b-imp").onclick = () => send({ cmd: "impedance", on: !impedanceOn });
+setInterval(() => {
+  const now = performance.now(), hz = rateCount / ((now - rateStart) / 1000);
+  setStat("s-rate", rateCount ? hz.toFixed(0) + " Hz" : "no data", rateCount === 0);
+  rateCount = 0; rateStart = now;
+}, 2000);
+
+// ---- traces --------------------------------------------------------------
+const traces = $("traces"), tctx = traces.getContext("2d");
+function drawTraces() {
+  const dpr = window.devicePixelRatio || 1, w = traces.clientWidth, h = traces.clientHeight;
+  if (traces.width !== Math.round(w * dpr) || traces.height !== Math.round(h * dpr)) {
+    traces.width = Math.round(w * dpr); traces.height = Math.round(h * dpr);
+  }
+  tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  tctx.clearRect(0, 0, w, h);
+  if (!nch) return;
+  const left = 46, top = 38, rowH = (h - top - 8) / nch, plotW = w - left - 10;
+  // chart paper: a line every second, heavier every row
+  tctx.lineWidth = 1;
+  for (let s = 0; s <= SECONDS; s++) {
+    const x = left + plotW * s / SECONDS;
+    tctx.strokeStyle = "#cbd9c8"; tctx.beginPath(); tctx.moveTo(x, top); tctx.lineTo(x, h - 8); tctx.stroke();
+  }
+  let perRow = Number($("gain").value);
+  if (!perRow) {
+    const v = chans.map(c => c.value.broad).sort((a, b) => a - b);
+    perRow = Math.max(10, 6 * v[Math.floor(nch / 2)]);
+  }
+  const step = Math.max(1, Math.floor(ringLen / plotW / 1.5));
+  tctx.font = '600 13px "Avenir Next", "Segoe UI", sans-serif'; tctx.textBaseline = "middle";
+  for (let c = 0; c < nch; c++) {
+    const mid = top + rowH * (c + 0.5);
+    tctx.fillStyle = "#1c2a39"; tctx.fillText(labels[c], 10, mid);
+    tctx.strokeStyle = "#1c2a39"; tctx.lineWidth = 1; tctx.beginPath();
+    const buf = shown[c];
+    for (let i = 0; i < ringLen; i += step) {
+      const v = buf[(head + i) % ringLen];
+      let y = mid - (v / perRow) * rowH;
+      y = Math.max(mid - rowH * 0.9, Math.min(mid + rowH * 0.9, y));
+      const x = left + plotW * i / ringLen;
+      i ? tctx.lineTo(x, y) : tctx.moveTo(x, y);
+    }
+    tctx.stroke();
+  }
+  tctx.fillStyle = "#55677a"; tctx.font = '13px "Avenir Next", "Segoe UI", sans-serif';
+  tctx.fillText(`last ${SECONDS} seconds, one row = ${perRow.toFixed(0)} µV`, left, 14);
+}
+
+// ---- head map ------------------------------------------------------------
+const headCv = $("head"), hctx = headCv.getContext("2d");
+const RAMP = [[238, 243, 234], [150, 201, 187], [47, 125, 135], [28, 42, 57]];
+function color(t) {
+  t = Math.max(0, Math.min(1, t)) * (RAMP.length - 1);
+  const i = Math.min(RAMP.length - 2, Math.floor(t)), f = t - i;
+  return RAMP[i].map((v, k) => Math.round(v + (RAMP[i + 1][k] - v) * f));
+}
+(function drawRamp() {
+  const r = $("ramp").getContext("2d");
+  for (let x = 0; x < 200; x++) { r.fillStyle = `rgb(${color(x / 199)})`; r.fillRect(x, 0, 1, 10); }
+})();
+const GRID = 72, field = hctx.createImageData(GRID, GRID), small = document.createElement("canvas");
+small.width = small.height = GRID;
+function drawHead() {
+  const S = headCv.width, R = S * 0.40, cx = S / 2, cy = S / 2 + 8;
+  hctx.clearRect(0, 0, S, S);
+  if (!nch) return;
+  const mode = $("mode").value;
+  const vals = chans.map(c => c.value[mode]);
+  const pts = labels.map((l, i) => ({ l, v: vals[i], p: POS[l] })).filter(e => e.p);
+  // log scale: these measures span orders of magnitude between electrodes
+  const logs = pts.map(e => Math.log10(Math.max(e.v, 1e-3)));
+  let lo = Math.min(...logs), hi = Math.max(...logs);
+  if (hi - lo < 0.3) { const m = (hi + lo) / 2; lo = m - 0.15; hi = m + 0.15; }
+  for (let gy = 0; gy < GRID; gy++) for (let gx = 0; gx < GRID; gx++) {
+    const x = (gx + 0.5) / GRID * 2.2 - 1.1, y = 1.1 - (gy + 0.5) / GRID * 2.2;
+    let num = 0, den = 0;
+    for (let k = 0; k < pts.length; k++) {
+      const d2 = (x - pts[k].p[0]) ** 2 + (y - pts[k].p[1]) ** 2 + 1e-4, wgt = 1 / (d2 * d2);
+      num += wgt * logs[k]; den += wgt;
+    }
+    const rgb = color((num / den - lo) / (hi - lo)), o = (gy * GRID + gx) * 4;
+    field.data[o] = rgb[0]; field.data[o + 1] = rgb[1]; field.data[o + 2] = rgb[2]; field.data[o + 3] = 255;
+  }
+  small.getContext("2d").putImageData(field, 0, 0);
+  hctx.save();
+  hctx.beginPath(); hctx.arc(cx, cy, R, 0, 2 * Math.PI); hctx.clip();
+  hctx.imageSmoothingEnabled = true;
+  hctx.drawImage(small, cx - R * 1.1, cy - R * 1.1, R * 2.2, R * 2.2);
+  hctx.restore();
+  hctx.strokeStyle = "#1c2a39"; hctx.lineWidth = 4; hctx.lineJoin = "round";
+  hctx.beginPath(); hctx.arc(cx, cy, R, 0, 2 * Math.PI); hctx.stroke();
+  hctx.beginPath(); hctx.moveTo(cx - R * 0.12, cy - R * 0.99); hctx.lineTo(cx, cy - R * 1.13); hctx.lineTo(cx + R * 0.12, cy - R * 0.99); hctx.stroke();
+  for (const side of [-1, 1]) {
+    hctx.beginPath(); hctx.ellipse(cx + side * R * 1.04, cy, R * 0.06, R * 0.16, 0, 0, 2 * Math.PI); hctx.stroke();
+  }
+  hctx.font = '600 22px "Avenir Next", "Segoe UI", sans-serif'; hctx.textAlign = "center"; hctx.textBaseline = "middle";
+  pts.forEach((e, k) => {
+    const x = cx + e.p[0] * R, y = cy - e.p[1] * R, t = (logs[k] - lo) / (hi - lo);
+    hctx.fillStyle = `rgb(${color(t)})`; hctx.strokeStyle = "#1c2a39"; hctx.lineWidth = 2.5;
+    hctx.beginPath(); hctx.arc(x, y, 22, 0, 2 * Math.PI); hctx.fill(); hctx.stroke();
+    hctx.fillStyle = t > 0.55 ? "#eef3ea" : "#1c2a39"; hctx.fillText(e.l, x, y + 1);
+  });
+  const fmt = v => v >= 1000 ? (v / 1000).toFixed(1) + " mV" : v.toFixed(v < 10 ? 1 : 0) + " µV";
+  $("lo").textContent = fmt(10 ** lo); $("hi").textContent = fmt(10 ** hi);
+}
+
+// ---- guided recording ----------------------------------------------------
+const STEPS = [
+  { key: "settle", say: "Sit still", detail: "Eyes open, relaxed. The signals need a few seconds to settle after the contact tone stops.", seconds: 20, mode: "broad" },
+  { key: "eyes_open", say: "Eyes open", detail: "Look at one spot on the screen. Try not to blink much.", seconds: 20, mode: "alpha" },
+  { key: "eyes_closed", say: "Close your eyes", detail: "Keep them closed until you hear two beeps.", seconds: 20, mode: "alpha" },
+  { key: "blinks", say: "Blink on each tick", detail: "Eyes open. Blink hard once every time you hear a tick.", seconds: 20, mode: "slow", tick: 2 },
+];
+let audio = null;
+function beep(freq, ms, when = 0) {
+  const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime + when;
+  o.frequency.value = freq; o.connect(g); g.connect(audio.destination);
+  g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t + ms / 1000);
+  o.start(t); o.stop(t + ms / 1000 + 0.02);
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function show(say, detail, count = "") { $("instruction").textContent = say; $("detail").textContent = detail; $("countdown").textContent = count; }
+function paintSteps(now) {
+  $("steps").innerHTML = STEPS.map((_, i) => `<span class="${i < now ? "done" : i === now ? "now" : ""}"></span>`).join("");
+}
+async function runGuide() {
+  audio = audio || new AudioContext();
+  $("b-start").disabled = true; $("b-imp").disabled = true;
+  mark("guide_start");
+  if (impedanceOn) { send({ cmd: "impedance", on: false }); await sleep(1500); }
+  for (let i = 0; i < STEPS.length; i++) {
+    const step = STEPS[i];
+    paintSteps(i); $("mode").value = step.mode;
+    show(step.say, step.detail, String(step.seconds));
+    beep(660, 180); mark(step.key + "_start");
+    const t0 = performance.now(); let nextTick = step.tick ? step.tick : Infinity;
+    while (true) {
+      const el = (performance.now() - t0) / 1000;
+      if (el >= step.seconds) break;
+      $("countdown").textContent = String(Math.ceil(step.seconds - el));
+      if (el >= nextTick) { beep(1200, 60); mark("blink_tick"); nextTick += step.tick; }
+      await sleep(50);
+    }
+    mark(step.key + "_end");
+    if (step.key === "eyes_closed") { beep(880, 150); beep(880, 150, 0.3); }
+  }
+  paintSteps(STEPS.length);
+  mark("guide_done");
+  show("Recording saved", "That is everything for this run. You can keep watching the signals or take the headset off.");
+  $("b-imp").disabled = false; $("b-start").disabled = false; $("b-start").textContent = "Record again";
+}
+$("b-start").onclick = runGuide;
+paintSteps(-1);
+
+function frame() { drawTraces(); drawHead(); requestAnimationFrame(frame); }
+connect(); frame();
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+/* The video round (js/screens/video.js): the player on the dark page, nothing around it. */
+
+.video-round {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px var(--gutter) 24px;
+  text-align: center;
+}
+
+.video-round h1 { font-size: clamp(32px, 5vw, 56px); }
+.video-instructions { font-size: 20px; color: var(--fg-2); max-width: 34em; }
+.video-status, .video-hint { font-size: 16px; color: var(--fg-3); min-height: 1.4em; }
+.video-problem { font-size: 20px; font-weight: 600; max-width: 34em; }
+
+/* The stage takes the room the lines around it leave; the player is the largest 16:9 box in it
+   (its size is set by video.js from the stage's size). */
+.video-stage {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.video-stage iframe {
+  display: block;
+  border: 0;
+  background: #000;
+}
+
+/* The black cover over the player (video.js): on it until the part played is reached, and
+   again at its end. Same cell and size as the player; the whole window once it fills it. */
+.video-stage > * { grid-area: 1 / 1; }
+.video-cover { background: #000; z-index: 1; }
+.video-round[data-full="true"] .video-cover { position: absolute; inset: 0; }
+
+/* While the block runs only the player and its title are on the screen. */
+.video-round[data-player="ready"] .video-actions:empty { display: none; }
+.video-round [hidden] { display: none; }
+
+/* From Start on (data-full): the player fills the window, over the HUD and everything else of
+   the page, and the page cannot scroll. The player letterboxes the video on black itself. */
+html.video-full, html.video-full body { overflow: hidden; }
+html.video-full #hud { visibility: hidden; }
+.video-round[data-full="true"] .video-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  background: #000;
+}
+.video-round[data-full="true"] .video-stage iframe { width: 100vw; height: 100vh; }
+/* A cross-origin frame takes every pointer move; while it plays the page takes them instead. */
+.video-round[data-pointer="page"] .video-stage iframe { pointer-events: none; }
+
+/* The bar with the leave controls (and the hint): under the player before Start, at the bottom
+   over it after, shown on input and hidden after a while (video.js). */
+.video-round[data-full="true"] .video-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 45;
+  padding: 4px 24px 12px;
+  border-radius: 16px;
+  background: rgba(18, 24, 38, 0.88);
+  color: var(--white);
+}
+.video-round[data-full="true"] .video-bar .leave { margin-top: 0; border-top: 0; max-width: none; }
+.video-round[data-full="true"] .video-bar .leave-btn { color: var(--on-navy-1); }
+.video-round[data-full="true"][data-controls="hidden"] .video-bar { display: none; }
+.video-round[data-full="true"] .video-bar .leave-btn:hover,
+.video-round[data-full="true"] .video-bar .leave-yes { color: var(--white); }
+.video-round[data-full="true"] .video-bar .leave-ask p,
+.video-round[data-full="true"] .video-bar .video-hint { color: var(--on-navy-1); }

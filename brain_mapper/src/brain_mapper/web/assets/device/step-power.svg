@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160" width="240" height="160" fill="none" stroke="#121826" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="A headset box with its power button pressed">
+  <!-- straps looping down from the box, as on the headset -->
+  <path d="M70 92 C38 92 28 116 28 146"/>
+  <path d="M170 92 C202 92 212 116 212 146"/>
+  <circle cx="28" cy="148" r="5"/>
+  <circle cx="212" cy="148" r="5"/>
+  <!-- the box on top, with its two lights and the power button -->
+  <rect x="62" y="64" width="116" height="62" rx="18"/>
+  <circle cx="90" cy="82" r="3.5" fill="#2447c8" stroke="none"/>
+  <circle cx="150" cy="82" r="3.5" fill="#2447c8" stroke="none"/>
+  <circle cx="120" cy="104" r="15" stroke="#2447c8"/>
+  <path d="M120 95 V103" stroke="#2447c8"/>
+  <path d="M112.5 99 A9 9 0 1 0 127.5 99" stroke="#2447c8"/>
+  <!-- a press from above -->
+  <path d="M120 14 V44" stroke="#2447c8"/>
+  <path d="M110 34 L120 46 L130 34" stroke="#2447c8"/>
+</svg>

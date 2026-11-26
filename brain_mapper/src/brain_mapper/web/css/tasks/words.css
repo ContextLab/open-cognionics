@@ -1,0 +1,76 @@
+/* Words and Delayed recall (js/tasks/words.js), drawn in the shared stimulus area (.task-panel,
+   no ground of its own: white on the page's navy, sized from --panel). In these two rounds the
+   area is a centered stage wider than the square (up to 1200 px), so the prompt and the finish
+   control sit on one line from 1512 px up; its height is the square's. */
+.words-task .task-panel { width: min(100cqw, 1200px); }
+
+.words-fixation,
+.words-word {
+  font-family: var(--sans);
+  color: var(--stim);
+  line-height: 1;
+  user-select: none;
+}
+.words-fixation { font-size: min(9vh, calc(var(--panel) * 0.2)); font-weight: 400; }
+/* The word: about 0.09 of the viewport height (144 px at 3840x1600, 88 px at 1512x982), never
+   wider than the stage holds (the longest pool word has 8 letters). */
+.words-word { font-size: min(9vh, calc(var(--panel) * 0.2)); font-weight: 600; letter-spacing: 0.01em; white-space: nowrap; }
+
+.words-recall {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--panel) * 0.035);
+  font-family: var(--sans);
+  font-size: clamp(16px, calc(var(--panel) * 0.04), 32px);
+  line-height: 1.35;
+}
+/* The recall cue (PEERS: a row of asterisks), then the prompt. */
+.words-cue { font-size: clamp(18px, calc(var(--panel) * 0.045), 36px); color: var(--stim-soft); margin: 0; letter-spacing: 0.2em; line-height: 1; }
+.words-prompt { font-size: clamp(18px, calc(var(--panel) * 0.042), 34px); color: var(--stim); margin: 0; text-align: center; max-width: 36em; }
+/* The field: white text on the page's navy, a soft white outline. When an entry is logged the
+   field clears and its border lights white with a glow for LOGGED_MS (200 ms, class
+   .words-logged), the same for every entry: a sign that it was taken, nothing about right or
+   wrong. No transition, so the sign is one steady step on and off. */
+.words-input {
+  width: min(80%, 760px);
+  font: 600 clamp(22px, calc(var(--panel) * 0.06), 48px) var(--sans);
+  padding: calc(var(--panel) * 0.015) calc(var(--panel) * 0.02);
+  border-radius: 10px;
+  border: 2px solid var(--stim-soft);
+  background: transparent;
+  color: var(--stim);
+  caret-color: var(--stim);
+  text-align: center;
+  outline: none;
+}
+.words-input.words-logged {
+  border-color: var(--stim);
+  box-shadow: 0 0 0 4px var(--stim-glow);
+}
+/* "I can't remember any more", then its one question. Plain outlined buttons; the focused one has
+   a white ring. */
+.words-finish { display: flex; justify-content: center; min-height: 2.6em; }
+.words-ask, .words-confirm { display: flex; align-items: center; justify-content: center; gap: 0.8em; flex-wrap: wrap; }
+.words-ask[hidden], .words-confirm[hidden] { display: none; }
+.words-done {
+  font: 600 clamp(16px, calc(var(--panel) * 0.032), 26px) var(--sans);
+  color: var(--stim);
+  background: transparent;
+  border: 2px solid var(--stim-soft);
+  border-radius: 10px;
+  padding: 0.35em 1em;
+  cursor: pointer;
+}
+.words-done:focus-visible { outline: 3px solid var(--stim); outline-offset: 3px; border-color: var(--stim); }
+.words-done:disabled { opacity: 0.5; cursor: default; }
+.words-hint, .words-question { font-size: clamp(14px, calc(var(--panel) * 0.028), 22px); color: var(--stim-soft); }
+.words-question { color: var(--stim); font-weight: 600; font-size: clamp(16px, calc(var(--panel) * 0.034), 28px); }
+/* The recall clock: one style from start to end (no color change, no flashing in the last 10 s). */
+.words-time { font-size: clamp(16px, calc(var(--panel) * 0.034), 28px); color: var(--stim-soft); margin: 0; font-variant-numeric: tabular-nums; }
+/* Once recall is over: one quiet line, no field. */
+.words-over { font-size: clamp(18px, calc(var(--panel) * 0.042), 34px); color: var(--stim-soft); }
+.words-problem { font-size: calc(var(--panel) * 0.045); line-height: 1.4; margin: 0 8%; color: var(--stim); text-align: center; }
